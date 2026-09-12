@@ -39,7 +39,11 @@ if (!(await waitFor(`http://localhost:${PORT}/health`))) { console.error('server
 // first show the raw 402 challenge (no payment) for the record
 const bare = await fetch(`http://localhost:${PORT}/terri`);
 console.log(`\n═══ 402 CHALLENGE (no payment) ═══\nHTTP ${bare.status}`);
-console.log(JSON.stringify(await bare.json().catch(() => null), null, 2).slice(0, 1200));
+const pr = bare.headers.get('PAYMENT-REQUIRED');
+if (pr) {
+  const decoded = JSON.parse(Buffer.from(pr, 'base64').toString('utf8'));
+  console.log('PAYMENT-REQUIRED (decoded):', JSON.stringify(decoded.accepts?.[0] ?? decoded, null, 2));
+}
 
 const client = run('client', ['src/client.mjs']);
 client.on('exit', (code) => cleanup(code ?? 1));
