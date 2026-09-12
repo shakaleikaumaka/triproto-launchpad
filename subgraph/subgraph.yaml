@@ -1,0 +1,57 @@
+specVersion: 1.2.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AgentLaunchRegistry
+    network: sepolia
+    source:
+      abi: AgentLaunchRegistry
+      # TODO(Lane A): paste the deployed AgentLaunchRegistry address (Sepolia)
+      address: "0x0000000000000000000000000000000000000000"
+      # TODO(Lane A): set to the contract deployment block for fast sync
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Agent
+        - LaunchEvent
+        - ConsentEvent
+        - HireEvent
+        - BlessEvent
+        - DelistEvent
+        - RelistEvent
+        - SubnameEvent
+        - PulseStats
+      abis:
+        - name: AgentLaunchRegistry
+          file: ./abis/AgentLaunchRegistry.json
+      eventHandlers:
+        - event: Registered(indexed uint256,string,indexed address)
+          handler: handleRegistered
+        - event: AgentLaunched(indexed uint256,indexed address,indexed bytes32,string,string,string,uint64)
+          handler: handleAgentLaunched
+        - event: ConsentChanged(indexed uint256,indexed uint8,indexed address,string,string)
+          handler: handleConsentChanged
+        - event: Delisted(indexed uint256,indexed address,string)
+          handler: handleDelisted
+        - event: Relisted(indexed uint256,indexed address)
+          handler: handleRelisted
+        - event: SubnameAssigned(indexed uint256,string,indexed bytes32,uint256)
+          handler: handleSubnameAssigned
+        - event: Hired(indexed uint256,indexed address,uint256,string,string)
+          handler: handleHired
+        - event: Blessed(indexed uint256,indexed address,string,string)
+          handler: handleBlessed
+      file: ./src/mapping.ts
+# Event spine synced to contracts/src/AgentLaunchRegistry.sol @ lane/contracts 20f034f.
+# Deliberately not handled (low pulse value): MetadataSet (6+ noisy lines per launch),
+# URIUpdated, SubnameIssuerUpdated (admin). Easy adds if the demo wants them.
+#
+# NOTE: the registry also deploys to Base Sepolia (tri-chain canon). The Graph
+# indexes one network per deployment — deploy this same subgraph a second time
+# with network: base-sepolia + the Base address when Lane A ships both.
