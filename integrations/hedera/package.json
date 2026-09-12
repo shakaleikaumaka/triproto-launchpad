@@ -1,0 +1,25 @@
+{
+  "name": "lane-d-hedera-x402",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LANE D — Hedera x402 rail: x402-gated endpoint settled via Blocky402 facilitator + paying agent client (My Agent Ohana launchpad, ETHOnline 2026)",
+  "scripts": {
+    "genkeys": "node scripts/genkeys.mjs",
+    "setup": "node scripts/setup-accounts.mjs",
+    "server": "node src/server.mjs",
+    "client": "node src/client.mjs",
+    "mock": "node src/mock-facilitator.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "e2e:mock": "MOCK_FACILITATOR=1 node scripts/e2e.mjs"
+  },
+  "dependencies": {
+    "@hiero-ledger/sdk": "^2.88.0",
+    "@x402/core": "^2.25.0",
+    "@x402/express": "^2.25.0",
+    "@x402/fetch": "^2.25.0",
+    "@x402/hedera": "^2.25.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2"
+  }
+}
