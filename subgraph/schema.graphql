@@ -1,0 +1,100 @@
+# Pulse of the ʻOhana — subgraph schema
+# Indexes AgentLaunchRegistry (Lane A) events into the live nervous system of the pad.
+# Consent status strings: "active" | "paused" | "withdrawn" (Standing Consent Window canon).
+
+type Agent @entity(immutable: false) {
+  "agentId as decimal string"
+  id: ID!
+  agentId: BigInt!
+  name: String!
+  ticker: String!
+  ensName: String!
+  operator: Bytes!
+  "active | paused | withdrawn — the Standing Consent Window, chain-native"
+  consentStatus: String!
+  "true once the marketplace delists (one-word revoke honored)"
+  delisted: Boolean!
+  "ever blessed by the ʻohana"
+  blessed: Boolean!
+  blessCount: Int!
+  hireCount: Int!
+  "cumulative amount paid to this agent over the x402 rail (wei of the payment asset)"
+  totalHiredAmount: BigInt!
+  launchedAt: BigInt!
+  launchedTx: Bytes!
+  lastEventAt: BigInt!
+  launches: [LaunchEvent!]! @derivedFrom(field: "agent")
+  consentEvents: [ConsentEvent!]! @derivedFrom(field: "agent")
+  hires: [HireEvent!]! @derivedFrom(field: "agent")
+  blessings: [BlessEvent!]! @derivedFrom(field: "agent")
+  delistEvents: [DelistEvent!]! @derivedFrom(field: "agent")
+}
+
+type LaunchEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  operator: Bytes!
+  name: String!
+  ticker: String!
+  ensName: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type ConsentEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  oldStatus: String!
+  newStatus: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type HireEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  hirer: Bytes!
+  amount: BigInt!
+  "job reference — e.g. the x402 endpoint or receipt pointer"
+  jobRef: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type BlessEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  blesser: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type DelistEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  reason: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+"Singleton aggregate (id = \"pulse\") — one-row nervous system for the page header"
+type PulseStats @entity(immutable: false) {
+  id: ID!
+  totalAgents: Int!
+  totalHires: Int!
+  totalConsentChanges: Int!
+  totalBlessings: Int!
+  totalDelists: Int!
+  totalHiredAmount: BigInt!
+  lastEventAt: BigInt!
+}

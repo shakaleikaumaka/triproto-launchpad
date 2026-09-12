@@ -1,0 +1,45 @@
+specVersion: 1.2.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AgentLaunchRegistry
+    network: sepolia
+    source:
+      abi: AgentLaunchRegistry
+      # TODO(Lane A): paste the deployed AgentLaunchRegistry address (Sepolia)
+      address: "0x0000000000000000000000000000000000000000"
+      # TODO(Lane A): set to the contract deployment block for fast sync
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Agent
+        - LaunchEvent
+        - ConsentEvent
+        - HireEvent
+        - BlessEvent
+        - DelistEvent
+        - PulseStats
+      abis:
+        - name: AgentLaunchRegistry
+          file: ./abis/AgentLaunchRegistry.json
+      eventHandlers:
+        - event: AgentLaunched(indexed uint256,indexed address,string,string,string)
+          handler: handleAgentLaunched
+        - event: ConsentChanged(indexed uint256,uint8,uint8)
+          handler: handleConsentChanged
+        - event: Hired(indexed uint256,indexed address,uint256,string)
+          handler: handleHired
+        - event: Blessed(indexed uint256,indexed address)
+          handler: handleBlessed
+        - event: Delisted(indexed uint256,string)
+          handler: handleDelisted
+      file: ./src/mapping.ts
+# NOTE: the registry also deploys to Base Sepolia (tri-chain canon). The Graph
+# indexes one network per deployment — deploy this same subgraph a second time
+# with network: base-sepolia + the Base address when Lane A ships both.

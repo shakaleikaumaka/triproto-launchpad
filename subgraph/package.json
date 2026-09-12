@@ -1,0 +1,16 @@
+{
+  "name": "my-agent-ohana-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pulse of the ʻOhana — indexes AgentLaunchRegistry events (AgentLaunched · ConsentChanged · Hired · Blessed · Delisted) for the Pulse page",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "create-studio": "graph create --studio my-agent-ohana",
+    "deploy-studio": "graph deploy --studio my-agent-ohana"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.98.1",
+    "@graphprotocol/graph-ts": "0.38.2"
+  }
+}
