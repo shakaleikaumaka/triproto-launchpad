@@ -2,7 +2,7 @@
 - Lane A contracts → branch `lane/contracts` → `contracts/**`
 - Lane B world → branch `lane/world` → `integrations/world/**`, `docs/world.md`
 - Lane C graph → branch `lane/graph` → `subgraph/**`, `web/pulse/**`
-- Lane D hedera → branch `lane/hedera` → `integrations/hedera/**`, `docs/hedera.md`
+- Lane D hedera → branch `lane/hedera` → `integrations/hedera/**`, `docs/hedera.md` — 🟡 harness done & live-facilitator-verified, real-settlement E2E blocked only on faucet signup wall (30-sec human tap, see docs/hedera.md)
 - Lane E research → branch `lane/research` → `research/**`, `docs/chainlink.md`, `docs/inch.md`, `docs/fetch-bsc.md`, `docs/cardano.md`
 - Lane F ui-docs → branch `lane/ui` → `web/**` (except web/pulse), `AI-USAGE.md`, `SUBMISSION.md`
 Update ONLY your row here (pull → edit → push; retry on conflict). Status: 🟡 building / 🟢 done / 🔴 blocked.
