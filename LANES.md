@@ -1,5 +1,5 @@
 # LANES — build ownership (touch ONLY your paths; push your branch)
-- Lane A contracts → branch `lane/contracts` → `contracts/**`
+- Lane A contracts → branch `lane/contracts` → `contracts/**` — 🟢 done (AgentLaunchRegistry + ENSv2SubnameIssuer; 20/20 tests; dedicated ENSv2 + fallback; event spine + deploy runbook in contracts/README.md)
 - Lane B world → branch `lane/world` → `integrations/world/**`, `docs/world.md`
 - Lane C graph → branch `lane/graph` → `subgraph/**`, `web/pulse/**`
 - Lane D hedera → branch `lane/hedera` → `integrations/hedera/**`, `docs/hedera.md`
