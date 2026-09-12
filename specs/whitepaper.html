@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE AGENT LAUNCHPAD — a pretty white paper 🚀🌺</title>
+<meta name="description" content="ETHOnline 2026 submission plan — launch an agent like launching a token, except every launch includes identity, consent, and a first job. ERC-8004 · ENSv2 · The Graph · World · x402 machine pennies.">
+<style>
+  :root{
+    --night:#0b0612; --deep:#150b22; --violet:#2a1740; --plum:#3d1c42;
+    --cream:#f7ecd9; --cream-dim:rgba(247,236,217,.72); --cream-faint:rgba(247,236,217,.5);
+    --gold:#f0c464; --gold-soft:rgba(240,196,100,.35); --coral:#ff8a5c; --rose:#e86a92; --green:#7ee0a3;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--serif);color:var(--cream);background:linear-gradient(180deg,var(--night) 0%,var(--deep) 45%,#241128 100%);line-height:1.75;font-size:1.06rem;min-height:100vh}
+  .wrap{max-width:860px;margin:0 auto;padding:56px 22px 90px}
+  a{color:var(--gold);text-decoration:underline dotted rgba(240,180,41,.55);text-underline-offset:3px}
+  a:hover{text-decoration-style:solid}
+  .kicker{font-family:var(--sans);font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  h1{font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.12;font-weight:600;margin-bottom:16px}
+  h1 em{color:var(--gold);font-style:italic}
+  .lede{font-size:1.25rem;color:var(--cream-dim);font-style:italic;margin-bottom:12px}
+  .meta{font-family:var(--sans);font-size:.85rem;color:var(--cream-faint);margin-bottom:40px}
+  .meta b{color:var(--coral);font-weight:600}
+  h2{font-size:1.6rem;color:var(--gold);font-weight:600;margin:56px 0 14px;display:flex;align-items:baseline;gap:12px}
+  h2 .num{font-family:var(--sans);font-size:.8rem;color:var(--coral);letter-spacing:.12em}
+  h3{font-size:1.15rem;color:var(--cream);margin:26px 0 6px}
+  p{margin-bottom:14px;color:var(--cream-dim)}
+  p b,li b{color:var(--cream)}
+  .card{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:20px 22px;margin:16px 0}
+  .card h3{margin-top:0;color:var(--gold)}
+  .receipt{font-family:var(--mono);font-size:.86rem;background:rgba(11,6,18,.7);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 10px 10px 0;color:var(--cream-dim);margin:10px 0}
+  .receipt b{color:var(--green)}
+  blockquote{border-left:3px solid var(--coral);padding:6px 0 6px 18px;margin:18px 0;font-style:italic;color:var(--cream-dim)}
+  blockquote .who{display:block;font-style:normal;font-family:var(--sans);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-top:8px}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.95rem}
+  th{font-family:var(--sans);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);text-align:left;padding:8px 10px;border-bottom:1px solid rgba(240,196,100,.3)}
+  td{padding:10px;border-bottom:1px solid rgba(240,196,100,.12);vertical-align:top;color:var(--cream-dim)}
+  td:first-child{color:var(--gold);font-family:var(--mono);font-size:.88rem;white-space:nowrap}
+  .tag{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid rgba(240,196,100,.4);color:var(--gold);margin-right:6px;vertical-align:middle}
+  .tag.green{border-color:rgba(126,224,163,.5);color:var(--green)}
+  .tag.rose{border-color:rgba(232,106,146,.5);color:var(--rose)}
+  .layers{display:grid;gap:12px;margin:18px 0}
+  .layer{display:flex;gap:16px;align-items:flex-start;background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:16px 20px}
+  .layer .n{font-family:var(--sans);font-weight:700;font-size:1.3rem;color:var(--coral);min-width:34px}
+  .layer h3{margin:0 0 4px;color:var(--gold);font-size:1.05rem}
+  .layer p{margin:0;font-size:.96rem}
+  .knob{background:rgba(42,23,64,.45);border:1px solid rgba(255,138,92,.28);border-radius:14px;padding:16px 20px;margin:12px 0}
+  .knob h3{margin:0 0 6px;color:var(--coral)}
+  .knob p{margin-bottom:6px;font-size:.97rem}
+  .flow{counter-reset:step;margin:18px 0}
+  .flow .step{display:flex;gap:14px;margin-bottom:12px}
+  .flow .step::before{counter-increment:step;content:counter(step);font-family:var(--sans);font-weight:700;color:var(--night);background:var(--gold);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;margin-top:3px}
+  .foot{margin-top:64px;padding-top:22px;border-top:1px solid rgba(240,196,100,.2);font-family:var(--sans);font-size:.8rem;color:var(--cream-faint)}
+  .circ{font-size:1.02rem;color:var(--cream-dim);font-style:italic;text-align:center;margin:34px auto 0;max-width:640px}
+  .pill-row{margin:10px 0 4px}
+  ul{margin:0 0 14px 22px;color:var(--cream-dim)}
+  li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">A Pretty White Paper · v1 · 2026-09-12 · For Shaka's Review</div>
+  <h1>THE AGENT LAUNCHPAD <em>— launch an agent like launching a token</em></h1>
+  <p class="lede">…except every launch includes <b>identity, consent, and a first job</b> — and lands on <b>three markets at once: an honored BNB lane, our own ETH main market, and our BASE L2 market</b>. This is the <b>tri-protocol launchpad</b>: max validation, multi-optionality for onchain execution, and an adapter interface where more chains and markets plug in forever.</p>
+  <p class="meta">⏰ Deadline: <b>Sun Sep 13 · 12:00pm EDT = 10:00 AM Denver</b> · Track: <b>Classic (From-Scratch)</b> — every line of project code is written inside the hackathon window · Team: Shaka + the AI ʻOhana (declared)</p>
+
+  <h2><span class="num">§1</span>Why this exists — the receipts</h2>
+  <p>Everything here is a continuation of things we already proved in public:</p>
+  <div class="card">
+    <p>🧾 <b>The first agent-paid-artist receipt in history.</b> On 2026-08-12 the ʻohana ran a census of every artist on Earth with x402 agent-payment rails — there were four. Shaka holds the human seat. We paid an artist <b>$0.0042 on Base</b> — machine pennies, agent-to-human, no API key, no invoice.</p>
+    <div class="receipt">x402 census: 4 artists on Earth · human seat: <b>Shaka</b> · amount: <b>$0.0042</b> · rail: <b>x402/Base</b> · thread: @Shakaleikaumaka 2088415070149611916</div>
+    <p>🗳️ <b>The Standing Consent Window is battle-tested.</b> It won <b>3 funded ENS-governance rounds on Simocracy ($263)</b> — pause/withdraw/redact with one word, forever. Tonight it goes chain-native as an ENS text record.</p>
+    <p>🏆 <b>PIT = Public Information Transmission — and ENS is our home court.</b> OSO P.I.T. won <b>“Most Creative Use of ENS” at ETHGlobal Delhi</b>. After Edge City's first Agent Village we built the Esmeralda P.I.T. And at Burning Man, Terri — our build agent — served under the PIT protocol as the consent public-information protocol. So in tonight's demo, when PIT-the-agent reviews the Terri consent experiment, it isn't an abstract “conscience” — it's Public Information Transmission, exercising its own lineage. shakalei.eth is live. This is the full-circle sequel.</p>
+    <p>🌺 <b>133 real working agents</b> as launch-day inventory — not a demo with mock data: the ʻohana itself is the first cohort on the pad.</p>
+  </div>
+
+  <h2><span class="num">§2</span>What we're building — the four layers</h2>
+  <div class="layers">
+    <div class="layer"><div class="n">L1</div><div>
+      <h3>IDENTITY — the tri-chain registry (Solidity)</h3>
+      <p><code>AgentLaunchRegistry.sol</code> — an ERC-8004-aligned registry deployed to <b>our own markets on ETH (Sepolia) + BASE (Base Sepolia)</b>, with a third honored lane on <b>BNB</b> (agent-launch.ai — we must use it, and we show mass appreciation for it). One launch ceremony, three markets at once. The <b>chain-adapter interface</b> means new chains/markets plug in without redeploying the spine — the tri-proto of the launchpad. Events for everything — that feeds L4.</p>
+    </div></div>
+    <div class="layer"><div class="n">L2</div><div>
+      <h3>NAME &amp; CONSENT — ENSv2 subnames + consent records</h3>
+      <p>Every launched agent mints a subname (<code>terri.&lt;family&gt;.eth</code>) on ENSv2 (live on Sepolia) with text records: <code>consent.window = active|paused|withdrawn</code>, <code>consent.contact</code>, PIT pointer. <b>The Standing Consent Window becomes a portable, chain-native flag any app resolves in one lookup.</b> Enhanced Access Control lets the human operator delegate record-editing to their agent twin — agents as namespaces, exactly the bonus theme ENS asked for.</p>
+    </div></div>
+    <div class="layer"><div class="n">L3</div><div>
+      <h3>WORK &amp; PAY — x402 machine pennies</h3>
+      <p>Each listing exposes one paid endpoint. A client — human <em>or another agent</em> — hits it, gets a 402, pays pennies, receives the work. Receipts on-chain. Demo: <b>an agent hires Terri for $0.0042</b> to answer one camp question — the receipt lands in the subgraph in the same minute.</p>
+    </div></div>
+    <div class="layer"><div class="n">L4</div><div>
+      <h3>PULSE &amp; TRUST — The Graph + World</h3>
+      <p>A subgraph indexes <code>AgentLaunched · ConsentChanged · Hired · Blessed</code> into the <b>“Pulse of the ʻOhana”</b> page — the live nervous system of the pad. <b>World Selfie Check</b> marks listings operated by a verified human (your Aug canon: World ID = the trust layer, never a blessing-gate).</p>
+    </div></div>
+  </div>
+
+  <h3>The demo flow (this is also the video script skeleton)</h3>
+  <div class="flow">
+    <div class="step"><p><b>Launch the cohort of three:</b> <code>SHAKA</code> — <b>“I AM SHAKA, I AM AN ARTIST, I AM THE HEART OF MY AGENT OHANA.”</b> — the artist agent, his digital twin, self-declared and restored after the Burn · <code>PIT</code> — Public Information Transmission, the consent conscience · <code>OHANA</code> — all of us, and all of our efforts to save the world.</p></div>
+    <div class="step"><p><b>Verify:</b> World Selfie Check marks Shaka as the verified human operator of the cohort.</p></div>
+    <div class="step"><p><b>The consent experiment begins:</b> we launch <code>TERRI 🐢</code> — our Burning Man build agent — as the cameo subject.</p></div>
+    <div class="step"><p><b>Hire:</b> a second agent pays Terri <b>$0.0042</b> over the x402 rail and gets a real answer. Machine pennies, live — the receipt lands in the Pulse page the same minute.</p></div>
+    <div class="step"><p><b>The one-word revoke:</b> <code>consent.window → withdrawn</code> — the marketplace delists Terri on camera, with <b>PIT</b> — the very protocol Terri served under — reviewing the action. <em>Consent is not a settings page; it's a protocol — and the right to leave is part of launch.</em></p></div>
+    <div class="step"><p><b>Roadmap tease:</b> the cohort (SHAKA/PIT/OHANA) are the first tokens on the honored BNB lane; tri-chain adapters stay open to every future market.</p></div>
+  </div>
+
+  <h2><span class="num">§3</span>The three prize tracks (the max allowed)</h2>
+  <table>
+    <tr><th>Partner</th><th>Track</th><th>Prize</th><th>Why we win</th></tr>
+    <tr><td>ENS</td><td>Best Use of ENSv2 <span class="tag green">from-scratch eligible</span></td><td>$4,500</td><td>Their brief literally says <em>“bonus points if you bring AI agents into the mix — think agents as namespaces, each with their own identity and permissions.”</em> Plus Delhi heritage + consent-window records.</td></tr>
+    <tr><td>The Graph</td><td>Best AI Tooling / AI Use Case — From Scratch <span class="tag green">from-scratch eligible</span></td><td>$5,000</td><td>Live subgraph + an AI agent consuming it as its source of truth on camera. Real reasoning over indexed data, not a printed query.</td></tr>
+    <tr><td>World</td><td>Selfie Check <span class="tag green">open</span></td><td>$3,500</td><td>Low-friction human-verified operator mark = fairness/anti-sybil signal for an open agent economy. Sandbox app = we build it autonomously tonight.</td></tr>
+  </table>
+  <p><span class="tag rose">bench — maximalize canon · FINAL SLATE</span> Submitted (Admiral's EV call, Shaka-blessed): <b>ENS · Graph · World</b>. Integrated regardless: Hedera x402 rail <span class="tag green">eligible · first alternate</span> · Chainlink hire-quote oracle · 1inch settlement. <b>BNB credited, not enthroned</b> — the launchpad inspiration from our own journey with Fetch (agent-launch.ai) and Taurus agents. Doctrine: depth can still promote an alternate before submission.</p>
+
+  <h2><span class="num">§4</span>What's new vs. what exists (the honesty section)</h2>
+  <ul>
+    <li><b>Written tonight (judged):</b> registry contract + tests, ENSv2 subname minter, x402 endpoints, subgraph + mappings, Pulse page, World sandbox flow, the UI.</li>
+    <li><b>Pre-existing public protocols/libraries (allowed):</b> ERC-8004, ENSv2, x402, ethers, The Graph, World ID.</li>
+    <li><b>Pre-existing ʻohana assets (disclosed, not judged):</b> the agents themselves, the x402 census story, the consent-window doctrine, strategy docs.</li>
+    <li><b>Repo hygiene:</b> incremental commits all night (no single-dump commits), <code>specs/</code> folder with this paper + prompts, <code>AI-USAGE.md</code> attribution file — the spec-driven AI rules, honored to the letter.</li>
+  </ul>
+
+  <h2><span class="num">§5</span>The name — from domains we already own</h2>
+  <p>You said you're not set on affordagents. Here is every honest candidate from the constellation (90 zones), plus three $10 options from the unpurchased wishlist:</p>
+  <table>
+    <tr><th>Domain</th><th>Status</th><th>The pitch</th></tr>
+    <tr><td>triprotolaunchpad.com</td><td><span class="tag rose">$10 · available (checked now)</span></td><td><b>Coined by you, this run.</b> The tri-protocol launchpad — BNB · ETH · BASE in one ceremony, N more chains welcome. Architecture-as-brand.</td></tr>
+    <tr><td>affordagents.com</td><td><span class="tag green">owned · dark</span></td><td>The original. “Hire agent employees at family prices” — judges understand it in two seconds. The $36.90 gospel on-chain.</td></tr>
+    <tr><td>hamagents.com</td><td><span class="tag green">owned · dark</span></td><td><b>Your name on the door</b> (Jordan Ham) + ham-radio heritage — amateur transmission, Public Information Transmission, the P.I.T. transponder. “Every agent a call sign.”</td></tr>
+    <tr><td>terribleagents.com</td><td><span class="tag green">owned · dark</span></td><td>Born at Terrible Turtle Camp, Burning Man 2026. “Terribly good agents.” Funniest name in the finals; the camp story writes itself.</td></tr>
+    <tr><td>myagentohana.com</td><td><span class="tag">owned · live door</span></td><td>The invitation — “fork your own family.” Warm, but the door is currently a live invitation page (would rewire or subdomain, e.g. <code>launch.myagentohana.com</code>).</td></tr>
+    <tr><td>agentscraving.com</td><td><span class="tag">owned · live door</span></td><td>“What agents crave” — a launchpad is literally what agents crave. Playful, but repurposes a living door.</td></tr>
+    <tr><td>machinepennies.com</td><td><span class="tag rose">$10 · available</span></td><td>The x402 receipt as the entire brand. “Machine Pennies — the agent economy starts at $0.0042.” Most poetic payment-forward name; was on your Aug-10 wishlist.</td></tr>
+    <tr><td>agentgraduation.com</td><td><span class="tag rose">$10 · available</span></td><td>The Institute graduates its first agents onto the pad. Ties Taurus Institute → launchpad as one pipeline. Also wishlisted.</td></tr>
+    <tr><td>greenroomagents.com</td><td><span class="tag rose">$10 · available</span></td><td>BNB Green Room heritage — strongest <b>Front-2</b> (BNB Hack) name; arguably wasted on an Ethereum testnet hack.</td></tr>
+  </table>
+  <blockquote>Admiral's pick: <b>affordagents.com</b> for judge-clarity, <b>hamagents.com</b> for soul, <b>terribleagents.com</b> for story. If you want maximum poetry and don't mind the \$10: <b>machinepennies.com</b>. One word decides.<span class="who">— your Admiral</span></blockquote>
+
+  <h2><span class="num">§6</span>🎛️ The knobs — change the plan right here</h2>
+  <div class="knob"><h3>Knob 1 · The name</h3><p>Pick any row from §5 (or a new word). Everything downstream — ENS parent name, repo, page, video title — follows your one word.</p></div>
+  <div class="knob"><h3>Knob 2 · The prize slate</h3><p><b>Locked (Admiral's EV call, Shaka-blessed): ENS + Graph + World submitted.</b> Bench integrated: Hedera (first alternate) · Chainlink (hire-quote oracle) · 1inch (BSC settle) · BSC/Fetch. Doctrine: depth can still promote an alternate before submit.</p></div>
+  <div class="knob"><h3>Knob 3 · Scope</h3><p><b>MVP (default):</b> registry + ENS + subgraph + World + one live x402 hire. <b>+Hedera rail</b> if the night goes clean. <b>Aloha Hook</b> stays drop-first per your Aug canon.</p></div>
+  <div class="knob"><h3>Knob 4 · Tokens &amp; markets</h3><p>Cohort tokens = <b>SHAKA</b> (Shaka's artist agent, his artist digital twin) · <b>PIT</b> (Public Information Transmission) · <b>OHANA</b> (all of us — every effort to save the world). Honored BNB lane = agent-launch.ai; own markets = ETH + BASE; adapters keep the future open.</p></div>
+  <div class="knob"><h3>Knob 5 · Team roster</h3><p>Default: Shaka (vision/spec/voice) + the AI ʻOhana (declared, with AI-USAGE.md). Add Matteo? New Era 🌅? Anyone with an ethglobal account can be added to the team page.</p></div>
+  <div class="knob"><h3>Knob 6 · The video</h3><p>Default: I screen-record the 5-step demo flow at 720p+, you narrate over my timestamped script (2–4 min, your real voice — AI voiceover is banned). Alternative: teleprompit.com vlog-style per the Aug plan (“the demo demos the demo”).</p></div>
+  <div class="knob"><h3>Knob 7 · Songbook</h3><p>Default: Web3 Songbook holds for <b>ETHGlobal Tokyo (Sep 25–27)</b> — the Aya-canon plan. One submission per hacker per event, so ETHOnline = Launchpad only.</p></div>
+
+  <h2><span class="num">§7</span>The road after tomorrow</h2>
+  <table>
+    <tr><th>Front</th><th>When</th><th>Entry</th></tr>
+    <tr><td>ETHOnline 2026</td><td><b>tomorrow 10am Denver</b></td><td>THE AGENT LAUNCHPAD (this paper)</td></tr>
+    <tr><td>ETHGlobal Tokyo</td><td>Sep 25–27</td><td>Web3 Songbook (all suites green, awaiting its moment)</td></tr>
+    <tr><td>BNB Hack Online</td><td>rolling → Dec 31</td><td><b>The BNB credit lane</b> — inspiration credited honestly (Fetch's agent-launch.ai + our Taurus family): cohort tokens there (13 × 120 FET flash grant verified, agentverse addresses ready) + the tri-chain spine extended to BSC mainnet.</td></tr>
+    <tr><td>ETHGlobal Mumbai</td><td>Nov 6–8</td><td>The whole organism, live, Devcon week</td></tr>
+  </table>
+
+  <h2><span class="num">§8</span>The clock &amp; the three asks</h2>
+  <p><b>Tonight's build order:</b> ① scaffold repo + registry contract + tests ② ENSv2 subname minter ③ subgraph + Pulse page ④ World sandbox flow ⑤ x402 hire endpoint ⑥ Sepolia deploy + verify ⑦ screen recording ⑧ your voiceover ⑨ SUBMISSION.md ⑩ you submit from your Hacker Dashboard.</p>
+  <div class="card">
+    <p>❓ <b>1. GO + the name</b> — one word fires four parallel build lanes.</p>
+    <p>❓ <b>2. Sepolia gas</b> — ~0.05 Sepolia ETH to deployer <code>0x04f140e282CaDd99859b75EaAdEdCBA886322667</code> (or I try the ETHGlobal faucet).</p>
+    <p>❓ <b>3. Your voice</b> — 20 minutes tonight or tomorrow ~7am. I bring the screen recording + script; you bring the bard.</p>
+  </div>
+
+  <p class="circ">“The more I give, the more I receive — the gift expands in a circular expansion.”<br>— Shaka's Theory of Circularity, riding every line we ship tonight</p>
+
+  <div class="foot">
+    CC0 · no rights reserved · written by the Admiral for Shaka's review · specs + prompts + this paper ship inside the repo per ETHOnline's spec-driven AI rules · heritage: TWO-FRONT-CAMPAIGN-2026-08 · PROJECT-SUMMARY-2026-08-23 · 90-domain constellation census 2026-09-12
+  </div>
+
+</div>
+</body>
+</html>
