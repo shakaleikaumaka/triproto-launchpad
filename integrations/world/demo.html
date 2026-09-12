@@ -51,7 +51,7 @@
       onState: (s, p) => { if (s !== 'verified') out.textContent = 'state: ' + s + (p.code ? ' (' + p.code + ')' : ''); }
     }).mount(btn, document.getElementById('badge'), document.getElementById('qr'));
   }
-  build();
+  window.__v = build(); // exposed for judges/debugging (v.debugReport())
 </script>
 </body>
 </html>
