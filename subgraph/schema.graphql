@@ -1,25 +1,35 @@
 # Pulse of the ʻOhana — subgraph schema
-# Indexes AgentLaunchRegistry (Lane A) events into the live nervous system of the pad.
+# Indexes the REAL AgentLaunchRegistry spine (synced to lane/contracts @ 20f034f):
+#   Registered · AgentLaunched · ConsentChanged · Delisted · Relisted
+#   · SubnameAssigned · Hired · Blessed
 # Consent status strings: "active" | "paused" | "withdrawn" (Standing Consent Window canon).
 
 type Agent @entity(immutable: false) {
   "agentId as decimal string"
   id: ID!
   agentId: BigInt!
-  name: String!
-  ticker: String!
-  ensName: String!
+  "ENS label from the launch ceremony (e.g. 'terri' → terri.<family>.eth)"
+  label: String!
   operator: Bytes!
+  manifestURI: String!
+  manifestHash: Bytes!
+  serviceEndpoint: String!
   "active | paused | withdrawn — the Standing Consent Window, chain-native"
   consentStatus: String!
-  "true once the marketplace delists (one-word revoke honored)"
-  delisted: Boolean!
-  "ever blessed by the ʻohana"
+  "false while delisted (one-word revoke or moderation); Relisted sets true"
+  listed: Boolean!
   blessed: Boolean!
   blessCount: Int!
   hireCount: Int!
-  "cumulative amount paid to this agent over the x402 rail (wei of the payment asset)"
+  "cumulative Hired amount as posted by allowlisted x402 rails (asset units of the rail)"
   totalHiredAmount: BigInt!
+  "bytes32(0) until the subname is assigned/anchored"
+  ensNode: Bytes!
+  ensTokenId: BigInt!
+  "subname expiry (type(uint64).max = permanent)"
+  expiry: BigInt!
+  "true if created via bare register() (identity only, unlisted, window paused)"
+  registeredOnly: Boolean!
   launchedAt: BigInt!
   launchedTx: Bytes!
   lastEventAt: BigInt!
@@ -28,6 +38,8 @@ type Agent @entity(immutable: false) {
   hires: [HireEvent!]! @derivedFrom(field: "agent")
   blessings: [BlessEvent!]! @derivedFrom(field: "agent")
   delistEvents: [DelistEvent!]! @derivedFrom(field: "agent")
+  relistEvents: [RelistEvent!]! @derivedFrom(field: "agent")
+  subnameEvents: [SubnameEvent!]! @derivedFrom(field: "agent")
 }
 
 type LaunchEvent @entity(immutable: true) {
@@ -35,9 +47,11 @@ type LaunchEvent @entity(immutable: true) {
   id: ID!
   agent: Agent!
   operator: Bytes!
-  name: String!
-  ticker: String!
-  ensName: String!
+  manifestHash: Bytes!
+  manifestURI: String!
+  serviceEndpoint: String!
+  label: String!
+  expiry: BigInt!
   timestamp: BigInt!
   blockNumber: BigInt!
   txHash: Bytes!
@@ -47,8 +61,12 @@ type ConsentEvent @entity(immutable: true) {
   "txHash-logIndex"
   id: ID!
   agent: Agent!
+  "derived: the agent's status in the store before this flip (contract emits only the new status)"
   oldStatus: String!
   newStatus: String!
+  changedBy: Bytes!
+  consentContact: String!
+  pitPointer: String!
   timestamp: BigInt!
   blockNumber: BigInt!
   txHash: Bytes!
@@ -58,10 +76,11 @@ type HireEvent @entity(immutable: true) {
   "txHash-logIndex"
   id: ID!
   agent: Agent!
-  hirer: Bytes!
+  client: Bytes!
   amount: BigInt!
-  "job reference — e.g. the x402 endpoint or receipt pointer"
-  jobRef: String!
+  "payment rail, e.g. 'x402-base-sepolia'"
+  rail: String!
+  receiptRef: String!
   timestamp: BigInt!
   blockNumber: BigInt!
   txHash: Bytes!
@@ -71,7 +90,10 @@ type BlessEvent @entity(immutable: true) {
   "txHash-logIndex"
   id: ID!
   agent: Agent!
-  blesser: Bytes!
+  operator: Bytes!
+  "trust lane, e.g. 'world' for World Selfie Check"
+  verifier: String!
+  proofRef: String!
   timestamp: BigInt!
   blockNumber: BigInt!
   txHash: Bytes!
@@ -81,7 +103,30 @@ type DelistEvent @entity(immutable: true) {
   "txHash-logIndex"
   id: ID!
   agent: Agent!
+  delistedBy: Bytes!
   reason: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type RelistEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  relistedBy: Bytes!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type SubnameEvent @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  agent: Agent!
+  label: String!
+  node: Bytes!
+  ensTokenId: BigInt!
   timestamp: BigInt!
   blockNumber: BigInt!
   txHash: Bytes!
@@ -91,10 +136,13 @@ type DelistEvent @entity(immutable: true) {
 type PulseStats @entity(immutable: false) {
   id: ID!
   totalAgents: Int!
+  "bare register() calls (identity only, not launched)"
+  totalRegistered: Int!
   totalHires: Int!
   totalConsentChanges: Int!
   totalBlessings: Int!
   totalDelists: Int!
+  totalRelists: Int!
   totalHiredAmount: BigInt!
   lastEventAt: BigInt!
 }

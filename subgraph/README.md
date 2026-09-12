@@ -10,8 +10,11 @@ Indexes **`AgentLaunchRegistry`** events into the live nervous system of the pad
 ## Status
 
 - ✅ `graph codegen` + `graph build` — **green** (graph-cli 0.98.1, graph-ts 0.38.2)
-- ✅ Build → IPFS upload verified end-to-end (`Build completed: Qmb4XnHyRkGdmCnokka5pQ2vMXZx8Uxg8GT2HjPFkVMv76`)
+- ✅ **Synced to the REAL contract** — event spine matches `contracts/src/AgentLaunchRegistry.sol` @ `lane/contracts 20f034f` (8 handlers: Registered · AgentLaunched · ConsentChanged · Delisted · Relisted · SubnameAssigned · Hired · Blessed)
+- ✅ Pulse page browser-verified in all 3 modes (live / mock / dead-endpoint)
+- ✅ Build → IPFS upload verified end-to-end (earlier skeleton build: `Qmb4XnHyRkGdmCnokka5pQ2vMXZx8Uxg8GT2HjPFkVMv76`)
 - 🔴 **Deploy blocked on ONE thing: a Subgraph Studio deploy key** (see below — ~60 seconds for Shaka)
+- ⏳ Waiting on Lane A: deployed Sepolia address + start block for `subgraph.yaml`
 
 ## 🔑 SHAKA'S 60-SECOND DEPLOY (the only blocker)
 
@@ -37,16 +40,27 @@ npx graph deploy my-agent-ohana -l v0.0.1
 > `✖ Failed to deploy to Graph node https://api.studio.thegraph.com/deploy/: Deploy key not found.`
 > The key is the only missing piece.
 
-## 🧩 Integration TODO (Lane A handshake)
+## 🧩 Integration (Lane A handshake)
 
-`abis/AgentLaunchRegistry.json` was designed from `specs/whitepaper.html` §2 **before**
-`lane/contracts` landed. When Lane A's `contracts/README` publishes real event signatures:
+The ABI + handlers are **already synced to the real contract**
+(`contracts/src/AgentLaunchRegistry.sol` @ `lane/contracts 20f034f`). Notes on the sync:
 
-1. Replace `abis/AgentLaunchRegistry.json` with the compiled ABI (or just the events).
-2. If signatures differ, update `subgraph.yaml` `eventHandlers` (keep the `indexed` markers —
-   graph-cli 0.98 requires them) and adjust `src/mapping.ts` param access.
-3. Fill `source.address` (Sepolia deploy) + `source.startBlock` (deploy block = fast sync).
-4. `npm run codegen && npm run build && npm run deploy-studio`.
+- `ConsentChanged` emits only the NEW status — the mapping **derives `oldStatus` from the
+  store** before updating (pure-subgraph fix, no contract change needed).
+- `AgentLaunched` carries `label/manifestURI/serviceEndpoint/manifestHash/expiry` (no
+  name/ticker on-chain — the manifest holds those); the Pulse page renders
+  `label.<family>.eth` (`FAMILY_NAME` const at the top of `web/pulse/index.html`).
+- `Registered` (ERC-8004) fires before `AgentLaunched` in the same tx — handled
+  (bare `register()` creates an unlisted `registeredOnly` agent; launch upgrades it).
+- Deliberately not indexed: `MetadataSet` (noisy), `URIUpdated`, `SubnameIssuerUpdated`.
+- If Lane A changes signatures after 20f034f: update `abis/` + `subgraph.yaml`
+  `eventHandlers` (keep the `indexed` markers — graph-cli 0.98 requires them), then
+  `npm run codegen && npm run build`.
+
+Remaining TODO before deploy:
+
+1. Fill `source.address` (Sepolia deploy) + `source.startBlock` (deploy block = fast sync).
+2. `npm run codegen && npm run build && npm run deploy-studio`.
 
 **Tri-chain note:** the registry also ships to Base Sepolia. The Graph indexes one network
 per deployment — deploy this same subgraph a second time with `network: base-sepolia` +

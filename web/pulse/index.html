@@ -28,32 +28,32 @@
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
   .mockbar{font-family:var(--sans);font-size:.85rem;background:rgba(255,138,92,.12);border:1px solid rgba(255,138,92,.45);border-radius:12px;padding:10px 16px;margin:14px 0;color:var(--coral)}
   .mockbar b{color:var(--gold)}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:22px 0}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:22px 0}
   .stat{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:14px 16px;text-align:center}
   .stat .v{font-family:var(--sans);font-weight:700;font-size:1.55rem;color:var(--gold)}
-  .stat .l{font-family:var(--sans);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-faint);margin-top:2px}
+  .stat .l{font-family:var(--sans);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-faint);margin-top:2px}
   h2{font-size:1.25rem;color:var(--gold);font-weight:600;margin:38px 0 12px;display:flex;align-items:baseline;gap:10px}
   h2 .num{font-family:var(--sans);font-size:.72rem;color:var(--coral);letter-spacing:.12em}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
   .agent{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:16px 18px;position:relative}
   .agent.delisted{opacity:.55;border-color:rgba(232,106,146,.4)}
   .agent .nm{font-size:1.1rem;color:var(--cream);font-weight:600}
-  .agent .tk{font-family:var(--mono);font-size:.8rem;color:var(--gold)}
-  .agent .ens{font-family:var(--mono);font-size:.78rem;color:var(--cream-faint);margin-top:2px;word-break:break-all}
+  .agent .ens{font-family:var(--mono);font-size:.78rem;color:var(--gold);margin-top:2px;word-break:break-all}
+  .agent .ep{font-family:var(--mono);font-size:.72rem;color:var(--cream-faint);margin-top:2px;word-break:break-all}
   .agent .meta{font-family:var(--sans);font-size:.75rem;color:var(--cream-dim);margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
   .chip{display:inline-block;font-family:var(--sans);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid}
   .chip.active{border-color:rgba(126,224,163,.5);color:var(--green)}
   .chip.paused{border-color:rgba(240,196,100,.5);color:var(--gold)}
   .chip.withdrawn{border-color:rgba(232,106,146,.5);color:var(--rose)}
+  .chip.unknown{border-color:rgba(247,236,217,.3);color:var(--cream-faint)}
   .chip.delisted{border-color:rgba(232,106,146,.7);color:var(--rose);background:rgba(232,106,146,.12)}
-  .chip.blessed{border-color:rgba(240,196,100,.6);color:var(--gold)}
+  .chip.ens{border-color:rgba(240,196,100,.5);color:var(--gold)}
   .feed{display:flex;flex-direction:column;gap:8px}
   .ev{display:flex;gap:12px;align-items:flex-start;background:rgba(42,23,64,.35);border:1px solid rgba(240,196,100,.12);border-radius:12px;padding:10px 14px}
   .ev .ic{font-size:1.05rem;flex-shrink:0;margin-top:1px}
-  .ev .tx{font-size:.95rem;color:var(--cream-dim)}
+  .ev .tx{font-size:.95rem;color:var(--cream-dim);word-break:break-word}
   .ev .tx b{color:var(--cream)}
   .ev .tm{font-family:var(--sans);font-size:.72rem;color:var(--cream-faint);white-space:nowrap;margin-left:auto;flex-shrink:0}
-  .ev a.hash{font-family:var(--mono);font-size:.72rem;text-decoration:underline dotted rgba(240,196,100,.55)}
   .foot{margin-top:52px;padding-top:18px;border-top:1px solid rgba(240,196,100,.2);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
   .foot code{font-family:var(--mono);font-size:.72rem;word-break:break-all}
   .circ{font-style:italic;color:var(--cream-dim);text-align:center;margin:30px auto 0;max-width:620px;font-size:.98rem}
@@ -77,7 +77,7 @@
   <h2><span class="num">AGENTS</span>The cohort on the pad</h2>
   <div class="grid" id="agents"></div>
 
-  <h2><span class="num">FEED</span>Launches · consent flips · hires · blessings</h2>
+  <h2><span class="num">FEED</span>Launches · consent flips · hires · blessings · comings &amp; goings</h2>
   <div class="feed" id="feed"></div>
 
   <p class="circ">“Consent is not a settings page; it's a protocol — and the right to leave is part of launch.”</p>
@@ -90,23 +90,28 @@
 <script>
 "use strict";
 /* ═══ Pulse of the ʻOhana — vendored fetch, no build step ═══
+   Schema synced to AgentLaunchRegistry.sol event spine canon (contracts/README @ lane/contracts).
    Endpoint resolution order:
    1. ?endpoint=<url>  (comma-separated for multi-chain merge)
    2. localStorage["pulse.endpoint"]
    3. SUBGRAPH_ENDPOINT const below
    If none resolves or every query fails → clearly-flagged MOCK mode. */
 const SUBGRAPH_ENDPOINT = ""; // TODO: paste Studio query URL after deploy (subgraph/README.md)
+const FAMILY_NAME = "agentohana.eth"; // display suffix for labels (ensName = label.family; canon per contracts/README)
+const ZERO32 = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 const QUERY = `query Pulse {
-  pulseStats(id: "pulse") { totalAgents totalHires totalConsentChanges totalBlessings totalDelists totalHiredAmount lastEventAt }
+  pulseStats(id: "pulse") { totalAgents totalRegistered totalHires totalConsentChanges totalBlessings totalDelists totalRelists totalHiredAmount lastEventAt }
   agents(first: 50, orderBy: launchedAt, orderDirection: desc) {
-    id agentId name ticker ensName operator consentStatus delisted blessed blessCount hireCount totalHiredAmount launchedAt
+    id agentId label operator manifestURI serviceEndpoint consentStatus listed blessed blessCount hireCount totalHiredAmount ensNode expiry registeredOnly launchedAt
   }
-  launchEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { name } operator name ticker ensName timestamp txHash }
-  consentEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { name } oldStatus newStatus timestamp txHash }
-  hireEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { name } hirer amount jobRef timestamp txHash }
-  blessEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { name } blesser timestamp txHash }
-  delistEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { name } reason timestamp txHash }
+  launchEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } operator label serviceEndpoint timestamp txHash }
+  consentEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } oldStatus newStatus changedBy timestamp txHash }
+  hireEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } client amount rail receiptRef timestamp txHash }
+  blessEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } verifier proofRef timestamp txHash }
+  delistEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } delistedBy reason timestamp txHash }
+  relistEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } relistedBy timestamp txHash }
+  subnameEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } label node timestamp txHash }
 }`;
 
 const $ = (id) => document.getElementById(id);
@@ -119,7 +124,8 @@ const ago = (ts) => {
   if (s < 86400) return Math.floor(s/3600) + "h ago";
   return Math.floor(s/86400) + "d ago";
 };
-/* x402 machine pennies: amounts are 6-decimal stablecoin units on the rail */
+/* x402 machine pennies: amounts are posted by rails in their asset's base units;
+   the demo rail is 6-decimal USDC ($0.0042 = 4200) */
 const pennies = (raw) => {
   try {
     const v = Number(raw) / 1e6;
@@ -127,6 +133,7 @@ const pennies = (raw) => {
     return "$" + v.toFixed(4).replace(/0+$/,"").replace(/\.$/,"");
   } catch { return String(raw); }
 };
+const ensOf = (label) => label ? `${label}.${FAMILY_NAME}` : "";
 
 function resolveEndpoints() {
   const url = new URL(location.href);
@@ -151,7 +158,7 @@ async function queryOne(endpoint) {
 }
 
 function mergeData(datas) {
-  const out = { pulseStats: null, agents: [], _feeds: { launch:[], consent:[], hire:[], bless:[], delist:[] } };
+  const out = { pulseStats: null, agents: [], _feeds: { launch:[], consent:[], hire:[], bless:[], delist:[], relist:[], subname:[] } };
   for (const d of datas) {
     if (d.pulseStats) out.pulseStats = d.pulseStats;
     out.agents.push(...(d.agents||[]));
@@ -160,6 +167,8 @@ function mergeData(datas) {
     out._feeds.hire.push(...(d.hireEvents||[]).map(e=>({...e,kind:"hire"})));
     out._feeds.bless.push(...(d.blessEvents||[]).map(e=>({...e,kind:"bless"})));
     out._feeds.delist.push(...(d.delistEvents||[]).map(e=>({...e,kind:"delist"})));
+    out._feeds.relist.push(...(d.relistEvents||[]).map(e=>({...e,kind:"relist"})));
+    out._feeds.subname.push(...(d.subnameEvents||[]).map(e=>({...e,kind:"subname"})));
   }
   return out;
 }
@@ -167,31 +176,36 @@ function mergeData(datas) {
 /* ── MOCK fallback (pre-deploy development only — NOT prize-eligible) ── */
 function mockData() {
   const now = Math.floor(Date.now()/1000);
-  const A = (id,name,ticker,ens,status,delisted,blessed,hires,ts) => ({
-    id:String(id), agentId:String(id), name, ticker, ensName:ens, operator:"0x04f140e282CaDd99859b75EaAdEdCBA886322667",
-    consentStatus:status, delisted, blessed, blessCount:blessed?1:0, hireCount:hires, totalHiredAmount:String(hires*4200), launchedAt:String(ts)
+  const op = "0x04f140e282CaDd99859b75EaAdEdCBA886322667";
+  const tx = "0x" + "ab".repeat(32);
+  const A = (id,label,status,listed,blessed,hires,ts) => ({
+    id:String(id), agentId:String(id), label, operator:op, manifestURI:"ipfs://manifest/"+label,
+    serviceEndpoint:"x402://"+label+"/job", consentStatus:status, listed, blessed,
+    blessCount:blessed?1:0, hireCount:hires, totalHiredAmount:String(hires*4200),
+    ensNode:ZERO32, ensTokenId:"0", expiry:"0", registeredOnly:false, launchedAt:String(ts)
   });
   const agents = [
-    A(1,"SHAKA","SHAKA","shaka.myagentohana.eth","active",false,true,0,now-3600),
-    A(2,"PIT","PIT","pit.myagentohana.eth","active",false,true,0,now-3500),
-    A(3,"OHANA","OHANA","ohana.myagentohana.eth","active",false,false,0,now-3400),
-    A(4,"TERRI 🐢","TERRI","terri.myagentohana.eth","withdrawn",true,true,1,now-3300),
+    A(1,"shaka","active",true,true,0,now-3600),
+    A(2,"pit","active",true,true,0,now-3500),
+    A(3,"ohana","active",true,false,0,now-3400),
+    A(4,"terri","withdrawn",false,true,1,now-3300),
   ];
-  const tx = "0x" + "0".repeat(64);
   return {
-    pulseStats: { totalAgents:4, totalHires:1, totalConsentChanges:1, totalBlessings:3, totalDelists:1, totalHiredAmount:"4200", lastEventAt:String(now-600) },
+    pulseStats: { totalAgents:4, totalRegistered:4, totalHires:1, totalConsentChanges:1, totalBlessings:3, totalDelists:1, totalRelists:0, totalHiredAmount:"4200", lastEventAt:String(now-600) },
     agents,
     _feeds: {
-      launch: agents.map(a=>({kind:"launch", id:"m"+a.id, agent:{name:a.name}, operator:a.operator, name:a.name, ticker:a.ticker, ensName:a.ensName, timestamp:a.launchedAt, txHash:tx})),
-      consent: [{kind:"consent", id:"mc1", agent:{name:"TERRI 🐢"}, oldStatus:"active", newStatus:"withdrawn", timestamp:String(now-600), txHash:tx}],
-      hire: [{kind:"hire", id:"mh1", agent:{name:"TERRI 🐢"}, hirer:"0x04f140e282CaDd99859b75EaAdEdCBA886322667", amount:"4200", jobRef:"x402://terri/camp-question", timestamp:String(now-1200), txHash:tx}],
-      bless: agents.filter(a=>a.blessed).map(a=>({kind:"bless", id:"mb"+a.id, agent:{name:a.name}, blesser:"0x04f140e282CaDd99859b75EaAdEdCBA886322667", timestamp:String(Number(a.launchedAt)+60), txHash:tx})),
-      delist: [{kind:"delist", id:"md1", agent:{name:"TERRI 🐢"}, reason:"one-word revoke — consent.window → withdrawn", timestamp:String(now-590), txHash:tx}],
+      launch: agents.map(a=>({kind:"launch", id:"m"+a.id, agent:{label:a.label}, operator:op, label:a.label, serviceEndpoint:a.serviceEndpoint, timestamp:a.launchedAt, txHash:tx})),
+      consent: [{kind:"consent", id:"mc1", agent:{label:"terri"}, oldStatus:"active", newStatus:"withdrawn", changedBy:op, timestamp:String(now-600), txHash:tx}],
+      hire: [{kind:"hire", id:"mh1", agent:{label:"terri"}, client:op, amount:"4200", rail:"x402-base-sepolia", receiptRef:"receipt:0.0042-usdc", timestamp:String(now-1200), txHash:tx}],
+      bless: agents.filter(a=>a.blessed).map(a=>({kind:"bless", id:"mb"+a.id, agent:{label:a.label}, verifier:"world", proofRef:"selfie-check", timestamp:String(Number(a.launchedAt)+60), txHash:tx})),
+      delist: [{kind:"delist", id:"md1", agent:{label:"terri"}, delistedBy:op, reason:"consent withdrawn", timestamp:String(now-590), txHash:tx}],
+      relist: [],
+      subname: agents.map(a=>({kind:"subname", id:"ms"+a.id, agent:{label:a.label}, label:a.label, node:"0x"+"cd".repeat(32), timestamp:String(Number(a.launchedAt)+30), txHash:tx})),
     }
   };
 }
 
-const ICONS = { launch:"🚀", consent:"🪟", hire:"🪙", bless:"🌺", delist:"🚪" };
+const ICONS = { launch:"🚀", consent:"🪟", hire:"🪙", bless:"🌺", delist:"🚪", relist:"💚", subname:"⚓" };
 
 function renderStats(s) {
   const cells = [
@@ -199,7 +213,7 @@ function renderStats(s) {
     [s?.totalHires ?? 0, "hires"],
     [s?.totalConsentChanges ?? 0, "consent flips"],
     [s?.totalBlessings ?? 0, "blessings"],
-    [s?.totalDelists ?? 0, "delists"],
+    [(s?.totalDelists ?? 0) + " / " + (s?.totalRelists ?? 0), "delists / relists"],
     [s && s.totalHiredAmount ? pennies(s.totalHiredAmount) : "$0", "machine pennies"],
   ];
   $("stats").innerHTML = cells.map(([v,l]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
@@ -207,31 +221,38 @@ function renderStats(s) {
 
 function renderAgents(agents) {
   if (!agents.length) { $("agents").innerHTML = `<div class="ev"><span class="tx">no agents indexed yet — the pad awaits its first launch 🌱</span></div>`; return; }
-  $("agents").innerHTML = agents.map(a => `
-    <div class="agent ${a.delisted ? "delisted" : ""}">
-      <div class="nm">${esc(a.name)} ${a.blessed ? "🌺" : ""}</div>
-      <div class="tk">$${esc(a.ticker)}</div>
-      <div class="ens">${esc(a.ensName)}</div>
+  $("agents").innerHTML = agents.map(a => {
+    const ensAnchored = a.ensNode && a.ensNode !== ZERO32;
+    return `
+    <div class="agent ${a.listed === false ? "delisted" : ""}">
+      <div class="nm">${esc(a.label || "agent #" + a.agentId)} ${a.blessed ? "🌺" : ""}</div>
+      <div class="ens">${esc(ensOf(a.label))}${ensAnchored ? " ⚓" : ""}</div>
+      <div class="ep">${esc(a.serviceEndpoint || "")}</div>
       <div class="meta">
         <span class="chip ${esc(a.consentStatus)}">${esc(a.consentStatus)}</span>
-        ${a.delisted ? '<span class="chip delisted">delisted</span>' : ""}
+        ${a.listed === false ? '<span class="chip delisted">delisted</span>' : ""}
+        ${ensAnchored ? '<span class="chip ens">ens anchored</span>' : ""}
         <span class="chip">${esc(a.hireCount)} hire${a.hireCount==1?"":"s"}</span>
         <span class="chip">${pennies(a.totalHiredAmount)}</span>
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 }
 
 function renderFeed(feeds) {
-  const all = [...feeds.launch, ...feeds.consent, ...feeds.hire, ...feeds.bless, ...feeds.delist]
-    .sort((a,b) => Number(b.timestamp) - Number(a.timestamp)).slice(0, 40);
+  const all = [...feeds.launch, ...feeds.consent, ...feeds.hire, ...feeds.bless, ...feeds.delist, ...feeds.relist, ...feeds.subname]
+    .sort((a,b) => Number(b.timestamp) - Number(a.timestamp)).slice(0, 50);
   if (!all.length) { $("feed").innerHTML = `<div class="ev"><span class="tx">quiet on the pad — the pulse waits for the first block 🫀</span></div>`; return; }
   $("feed").innerHTML = all.map(e => {
+    const nm = e.agent?.label || e.label || "?";
     let body = "";
-    if (e.kind === "launch") body = `<b>${esc(e.name)}</b> ($${esc(e.ticker)}) launched → <b>${esc(e.ensName)}</b> by ${short(e.operator)}`;
-    if (e.kind === "consent") body = `<b>${esc(e.agent?.name)}</b> consent: ${esc(e.oldStatus)} → <b>${esc(e.newStatus)}</b>`;
-    if (e.kind === "hire") body = `<b>${esc(e.agent?.name)}</b> hired for <b>${pennies(e.amount)}</b> by ${short(e.hirer)} · ${esc(e.jobRef)}`;
-    if (e.kind === "bless") body = `<b>${esc(e.agent?.name)}</b> blessed by ${short(e.blesser)} 🌺`;
-    if (e.kind === "delist") body = `<b>${esc(e.agent?.name)}</b> delisted — ${esc(e.reason)}`;
+    if (e.kind === "launch") body = `<b>${esc(ensOf(e.label))}</b> launched by ${short(e.operator)} · endpoint ${esc(e.serviceEndpoint)}`;
+    if (e.kind === "consent") body = `<b>${esc(ensOf(nm))}</b> consent: ${esc(e.oldStatus)} → <b>${esc(e.newStatus)}</b> by ${short(e.changedBy)}`;
+    if (e.kind === "hire") body = `<b>${esc(ensOf(nm))}</b> hired for <b>${pennies(e.amount)}</b> by ${short(e.client)} · ${esc(e.rail)} · ${esc(e.receiptRef)}`;
+    if (e.kind === "bless") body = `<b>${esc(ensOf(nm))}</b> blessed — verifier ${esc(e.verifier)} 🌺`;
+    if (e.kind === "delist") body = `<b>${esc(ensOf(nm))}</b> delisted — ${esc(e.reason)} (by ${short(e.delistedBy)})`;
+    if (e.kind === "relist") body = `<b>${esc(ensOf(nm))}</b> relisted by ${short(e.relistedBy)} — welcome back 💚`;
+    if (e.kind === "subname") body = `<b>${esc(ensOf(e.label))}</b> anchored on ENSv2 ⚓ node ${short(e.node)}`;
     return `<div class="ev"><span class="ic">${ICONS[e.kind]}</span><span class="tx">${body}</span><span class="tm">${ago(e.timestamp)}</span></div>`;
   }).join("");
 }
@@ -266,7 +287,7 @@ function setMode(mock, err) {
 function paint(data) {
   renderStats(data.pulseStats);
   renderAgents(data.agents || []);
-  renderFeed(data._feeds || { launch:[], consent:[], hire:[], bless:[], delist:[] });
+  renderFeed(data._feeds || { launch:[], consent:[], hire:[], bless:[], delist:[], relist:[], subname:[] });
 }
 
 refresh();
