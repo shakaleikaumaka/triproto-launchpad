@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OhanaWorld — verified human operator demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 560px; margin: 2rem auto; padding: 0 1rem; background: #0f1216; color: #e8ecf1; }
+  h1 { font-size: 1.3rem; } h1 small { color: #8b95a3; font-weight: 400; }
+  .card { background: #171c24; border: 1px solid #2a3341; border-radius: 12px; padding: 1rem 1.25rem; margin: 1rem 0; }
+  button { background: #2f6fed; color: #fff; border: 0; border-radius: 8px; padding: .6rem 1rem; font-size: 1rem; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  #badge { font-size: 1.05rem; margin: .75rem 0; }
+  #qr img { background: #fff; padding: 8px; border-radius: 8px; }
+  pre { background: #0b0e12; border-radius: 8px; padding: .75rem; font-size: .75rem; overflow-x: auto; white-space: pre-wrap; }
+  label { font-size: .8rem; color: #8b95a3; display: block; margin-top: .5rem; }
+  input, select { width: 100%; box-sizing: border-box; background: #0b0e12; color: #e8ecf1; border: 1px solid #2a3341; border-radius: 6px; padding: .4rem; }
+</style>
+</head>
+<body>
+<h1>🌺 OhanaWorld <small>· verified human operator (World ID Selfie Check, sandbox)</small></h1>
+
+<div class="card">
+  <label>app_id <input id="app_id" placeholder="app_… (Developer Portal)"></label>
+  <label>signal (operator wallet / agent id) <input id="signal" placeholder="0x… or terri.ohana.eth"></label>
+  <label>environment
+    <select id="environment"><option>sandbox</option><option>staging</option><option>production</option></select>
+  </label>
+  <label>server.mjs base <input id="serverUrl" value="http://localhost:8420"></label>
+  <p style="margin:.75rem 0 0"><button id="verify-btn">Verify human operator</button></p>
+  <div id="badge">⚪ Not verified</div>
+  <div id="qr"></div>
+</div>
+
+<div class="card"><b>Result</b><pre id="out">—</pre></div>
+
+<script src="./vendor/qrcode-generator.js"></script>
+<script src="./verify.js"></script>
+<script>
+  const out = document.getElementById('out');
+  const btn = document.getElementById('verify-btn');
+  function build() {
+    return OhanaWorld.createOperatorVerifier({
+      app_id: document.getElementById('app_id').value || 'app_missing',
+      signal: document.getElementById('signal').value || undefined,
+      environment: document.getElementById('environment').value,
+      serverUrl: document.getElementById('serverUrl').value.replace(/\/$/, ''),
+      debug: true,
+      onVerified: (badge) => { out.textContent = '✅ VERIFIED\n' + JSON.stringify(badge, null, 2); },
+      onError: (e) => { out.textContent = '🔴 FAILED\n' + JSON.stringify(e, null, 2); },
+      onState: (s, p) => { if (s !== 'verified') out.textContent = 'state: ' + s + (p.code ? ' (' + p.code + ')' : ''); }
+    }).mount(btn, document.getElementById('badge'), document.getElementById('qr'));
+  }
+  build();
+</script>
+</body>
+</html>

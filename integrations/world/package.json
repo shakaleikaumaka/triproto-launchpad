@@ -1,0 +1,14 @@
+{
+  "name": "ohana-world-integration",
+  "version": "1.0.0",
+  "private": true,
+  "description": "World ID Selfie Check 'verified human operator' mark for My Agent Ohana launchpad (Lane B)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node test/sign.test.mjs && node test/server.test.mjs"
+  },
+  "dependencies": {
+    "@worldcoin/idkit-core": "4.2.4"
+  }
+}
