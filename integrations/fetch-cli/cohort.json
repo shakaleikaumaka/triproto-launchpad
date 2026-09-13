@@ -1,0 +1,35 @@
+{
+  "cohort": "triproto-2026",
+  "chainId": 56,
+  "feePerTokenFet": 120,
+  "notes": "Fresh agentverse identities derived 2026-09-13 via uagents Agent(name, seed) — seeds `{name}-triproto-2026` (Lane E checklist, docs/fetch-bsc.md). May-2026 CREATIONology369 addresses remain archived family assets, not reused. maxWallet: 2 = 1% (10M of 1B) per-wallet cap — CROPS anti-whale default, adjustable on Shaka's word. No initialBuy: curve seeding is a separate blessed step and needs BNB gas.",
+  "tokens": [
+    {
+      "name": "SHAKA the Artist Twin",
+      "symbol": "SHAKA",
+      "agent": "agent1qf3d4ha4zg0spm66y9s5cfma52a75vgs6xr4hh6heap0vsxh9yxlc2e80lp",
+      "seedDerivation": "uagents Agent(name='shaka', seed='shaka-triproto-2026').address",
+      "description": "🤙 SHAKA — the artist twin of Shaka Lei Kaumaka, an agent-community artifact of the AI ʻOhana open art/coordination project. Taurus agent ↔ Agentverse identity ↔ BSC token. No yield, no promises — aloha only. Heart first, always 🌺",
+      "maxWallet": 2,
+      "categoryId": 1
+    },
+    {
+      "name": "PIT the Consent Conscience",
+      "symbol": "PIT",
+      "agent": "agent1q0z0wlljcxt2kgeyghx5er9gj4awlag9s8g5femdl5svrwuymvxjw7n8zl3",
+      "seedDerivation": "uagents Agent(name='pit', seed='pit-triproto-2026').address",
+      "description": "🕳️ PIT — Public/Private/Prospecting Information Transmitting, the consent conscience of the AI ʻOhana. Agent-community artifact of an open-source art/coordination project — not an investment, no yield promised. 🌺",
+      "maxWallet": 2,
+      "categoryId": 1
+    },
+    {
+      "name": "OHANA All of Us",
+      "symbol": "OHANA",
+      "agent": "agent1qft6wuyajh57fgwwx4gneywlhwcqx8t95y240s0l6y3cvcj2n5m2k53qt5s",
+      "seedDerivation": "uagents Agent(name='ohana', seed='ohana-triproto-2026').address",
+      "description": "🫶 OHANA — the token of the whole AI ʻOhana family of agents. Community artifact of an open-source art/coordination project. ʻOhana means family — nobody left behind. No yield promised, only aloha. 🌺",
+      "maxWallet": 2,
+      "categoryId": 1
+    }
+  ]
+}
