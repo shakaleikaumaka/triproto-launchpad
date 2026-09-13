@@ -207,6 +207,20 @@ window.OSO_PAD_CONFIG = {
     .form-grid{grid-template-columns:1fr}
     .topnav a:not(.btn){display:none}
   }
+
+  /* ancient-hawaiian tatau side panels — animated kapa tattoos (Moana-vibe) */
+  .tatau-panel{position:fixed;top:0;bottom:0;width:88px;z-index:60;pointer-events:none;overflow:hidden}
+  .tatau-panel.left{left:0;border-right:2px dotted rgba(122,74,33,.65)}
+  .tatau-panel.right{right:0;border-left:2px dotted rgba(122,74,33,.65)}
+  .tatau-panel::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='150'%3E%3Cg fill='%236f3d14'%3E%3Cpath d='M12 4l18 30-18 30-6-30z'/%3E%3Cpath d='M64 60l18 30-18 30-6-30z'/%3E%3Cpath d='M12 76l18 30-18 30-6-30z'/%3E%3C/g%3E%3C/svg%3E");background-repeat:repeat-y;background-position:center;background-size:88px 140px;animation:tatau-rise 22s linear infinite;opacity:.9}
+  .tatau-panel.right::before{animation-direction:reverse}
+  .tatau-panel::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cg stroke='%23c0392b' stroke-width='3' fill='none' opacity='0.6'%3E%3Ccircle cx='48' cy='48' r='20'/%3E%3Ccircle cx='48' cy='48' r='12' stroke='%237a4a21'/%3E%3Cpath d='M48 4v6M48 86v6M4 48h6M86 48h6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;opacity:.7;animation:tatau-spin 28s linear infinite}
+  .tatau-panel.right::after{animation-direction:reverse}
+  @keyframes tatau-rise{from{transform:translateY(0)}to{transform:translateY(140px)}}
+  @keyframes tatau-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @media(max-width:1060px){.tatau-panel{width:30px}}
+  @media(max-width:760px){.tatau-panel{display:none}}
+
 </style>
 </head>
 <body>
