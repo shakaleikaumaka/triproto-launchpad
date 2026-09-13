@@ -27,11 +27,19 @@ client (agent)                resource server                Blocky402 facilitat
 
 ```bash
 npm install
-npm run genkeys            # → paste output into .env (cp .env.example .env first)
+cp .env.example .env
+# FAST PATH — already funded account (ED25519 or ECDSA):
+#   fill PAYER_KEY + PAYER_ACCOUNT_ID in .env → npm run setup skips hollow completion
+# FRESH PATH — from scratch:
+npm run genkeys            # → paste output into .env
 # paste PAYER_EVM at https://portal.hedera.com/faucet → "Receive 10 testnet HBAR"
-npm run setup              # completes the payer account + auto-creates receiver + fills IDs
+npm run setup              # provisions payer + auto-creates receiver (~5 tℏ) + fills IDs
 npm run e2e                # boots server + paying client, one REAL paid request
 ```
+
+**Proven live on testnet** — settlement tx `0.0.7162784@1789264118.054067693`
+(HashScan: https://hashscan.io/testnet/transaction/0-0-7162784-1789264118-054067693),
+settled by Blocky402 with the facilitator paying the fee. Full proof in `docs/hedera.md`.
 
 ## What's here
 
@@ -40,7 +48,7 @@ npm run e2e                # boots server + paying client, one REAL paid request
 | `src/server.mjs` | express resource server — `GET /terri` gated by `@x402/express` paymentMiddleware, `exact` scheme, HBAR (`0.0.0`), 100,000 tinybar (0.001 ℏ) |
 | `src/client.mjs` | paying agent — `@x402/fetch` + `@x402/hedera` signer; pays and prints the settlement proof |
 | `src/mock-facilitator.mjs` | ⚠️ **MOCK — offline demos only.** Same HTTP shape, fabricates success, **no chain writes** |
-| `scripts/setup-accounts.mjs` | completes the faucet's hollow payer account + auto-creates the receiver |
+| `scripts/setup-accounts.mjs` | payer provisioning: existing funded `PAYER_ACCOUNT_ID` (skips hollow completion, ED25519+ECDSA) or fresh faucet hollow completion → auto-creates the receiver (~5 tℏ) |
 | `scripts/genkeys.mjs` | fresh ECDSA keypairs |
 | `scripts/e2e.mjs` | one-command end-to-end run (prints the raw 402 challenge too) |
 
