@@ -97,6 +97,8 @@
    3. SUBGRAPH_ENDPOINT const below
    If none resolves or every query fails → clearly-flagged MOCK mode. */
 const SUBGRAPH_ENDPOINT = "https://api.studio.thegraph.com/query/1760239/my-agent-ohana/v0.0.1"; // LIVE — Studio deploy (The Graph prize: live data from a Graph provider)
+const SUBGRAPH_API_KEY = "ab23adecd20fb599f7cc4953375c69a7"; // public query key (client-safe, rate-limited to the pad)
+
 const FAMILY_NAME = "agentohana.eth"; // display suffix for labels (ensName = label.family; canon per contracts/README)
 const ZERO32 = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -148,7 +150,7 @@ function resolveEndpoints() {
 async function queryOne(endpoint) {
   const res = await fetch(endpoint, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", authorization: `Bearer ${SUBGRAPH_API_KEY || (localStorage.getItem("pulse_apikey")||"")}` },
     body: JSON.stringify({ query: QUERY })
   });
   if (!res.ok) throw new Error("HTTP " + res.status);
