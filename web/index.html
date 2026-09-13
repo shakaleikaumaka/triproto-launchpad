@@ -18,14 +18,14 @@
 /* ── POST-DEPLOY CONFIG (the only block we edit after Lane A deploys) ── */
 window.OSO_PAD_CONFIG = {
   // ENSv2 parent name the cohort mints subnames under (Lane A/B wire the minter)
-  ensParent: 'myagentohana.eth',            // TBD — final family name on Shaka's word
+  ensParent: 'myagentohana.eth',            // family name (fallback-label mode)
   // Tri-chain markets. address:'' = not yet deployed → preview mode.
   chains: {
     11155111: {
       key: 'eth', name: 'ETH · Sepolia', role: 'our main market',
       rpc: 'https://ethereum-sepolia-rpc.publicnode.com',
       explorer: 'https://sepolia.etherscan.io',
-      address: '',                          // TBD — AgentLaunchRegistry (Lane A)
+      address: '0x62412fcA6437b914EDD87b85455682Ec73968347', // AgentLaunchRegistry (Sepolia, deployed 2026-09-13)
     },
     84532: {
       key: 'base', name: 'BASE · Base Sepolia', role: 'our L2 market',
@@ -55,7 +55,7 @@ window.OSO_PAD_CONFIG = {
   // Lane B hook — World Selfie Check. integrations/world registers
   // window.OHANA_WORLD = { verify: async (operatorAddress) => bool }
   world: {
-    appId: 'app_staging_TBD',               // TBD — Lane B sandbox app
+    appId: 'app_ed8b98470cc596a210d27b923bc1d689', // World app (production, Shaka-created 2026-09-13)
     action: 'ohana-launch-operator',
     verifiedOperators: [],                  // TBD — e.g. Shaka's operator address post-verify
   },

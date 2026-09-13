@@ -10,9 +10,9 @@ dataSources:
     source:
       abi: AgentLaunchRegistry
       # TODO(Lane A): paste the deployed AgentLaunchRegistry address (Sepolia)
-      address: "0x0000000000000000000000000000000000000000"
+      address: "0x62412fcA6437b914EDD87b85455682Ec73968347"
       # TODO(Lane A): set to the contract deployment block for fast sync
-      startBlock: 0
+      startBlock: 11692692
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
