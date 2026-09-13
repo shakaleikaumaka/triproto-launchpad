@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Agent ʻOhana — launch your agent ʻohana to three chains at once</title>
 <meta name="description" content="The tri-protocol launchpad: launch an agent like launching a token — except every launch includes identity, consent, and a first job. ETH (Sepolia) · BASE (Base Sepolia) · honored BNB lane. ERC-8004 · ENSv2 · The Graph · World · x402 machine pennies.">
+<link rel="icon" type="image/png" href="../assets/logo-flower.png">
 <!-- ══════════════════════════════════════════════════════════════════════
   MY AGENT ʻOHANA — the pad's front door (eventual home: myagentohana.com)
   Lane F (ui-docs) · ETHOnline 2026 · Classic From-Scratch
@@ -66,47 +67,49 @@ window.OSO_PAD_CONFIG = {
 </script>
 <style>
   :root{
-    --night:#0b0612; --deep:#150b22; --violet:#2a1740; --plum:#3d1c42;
-    --cream:#f7ecd9; --cream-dim:rgba(247,236,217,.72); --cream-faint:rgba(247,236,217,.5);
-    --gold:#f0c464; --gold-soft:rgba(240,196,100,.35); --coral:#ff8a5c; --rose:#e86a92; --green:#7ee0a3;
+    --night:#2c1f12; --deep:#f6eeda; --violet:#fbf6ea; --plum:#ecdfc0;
+    --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --gold-soft:rgba(138,90,30,.3); --coral:#b0502a; --rose:#a13a4e; --green:#3f7040;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
     --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
     --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:var(--serif);color:var(--cream);background:linear-gradient(180deg,var(--night) 0%,var(--deep) 45%,#241128 100%);line-height:1.75;font-size:1.06rem;min-height:100vh}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.75;font-size:1.06rem;min-height:100vh}
   .wrap{max-width:960px;margin:0 auto;padding:0 22px 90px}
-  a{color:var(--gold);text-decoration:underline dotted rgba(240,180,41,.55);text-underline-offset:3px}
+  a{color:var(--gold);text-decoration:underline dotted rgba(138,90,30,.5);text-underline-offset:3px}
   a:hover{text-decoration-style:solid}
   code{font-family:var(--mono);font-size:.9em;color:var(--gold)}
 
   /* ── top bar ── */
-  .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);background:rgba(11,6,18,.78);border-bottom:1px solid rgba(240,196,100,.15)}
+  .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);background:rgba(247,240,223,.88);border-bottom:1px solid rgba(91,70,51,.22)}
   .topbar .inner{max-width:960px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
   .wordmark{font-weight:600;font-size:1.05rem;color:var(--cream);text-decoration:none;letter-spacing:.01em}
-  .wordmark em{color:var(--gold);font-style:italic}
+  .wordmark img.brand{height:30px;width:30px;border-radius:50%;vertical-align:-9px;margin-right:9px;box-shadow:0 1px 3px rgba(59,44,30,.35)}
+  .wordmark em,.plumeria{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
   .topnav{margin-left:auto;display:flex;gap:16px;align-items:center;font-family:var(--sans);font-size:.82rem}
   .topnav a{color:var(--cream-dim);text-decoration:none}
   .topnav a:hover{color:var(--gold)}
 
   /* ── hero ── */
-  .hero{padding:72px 0 30px;text-align:left}
+  .hero{padding:72px 0 30px;text-align:left;position:relative}
   .kicker{font-family:var(--sans);font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
   h1{font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.12;font-weight:600;margin-bottom:16px}
-  h1 em{color:var(--gold);font-style:italic}
+  h1 em{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
   .lede{font-size:1.28rem;color:var(--cream-dim);font-style:italic;margin-bottom:20px;max-width:46ch}
   .lede b{color:var(--cream)}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
-  .chip{font-family:var(--sans);font-size:.75rem;letter-spacing:.08em;padding:5px 13px;border-radius:99px;border:1px solid rgba(240,196,100,.35);color:var(--gold);background:rgba(42,23,64,.4)}
+  .chip{font-family:var(--sans);font-size:.75rem;letter-spacing:.08em;padding:5px 13px;border-radius:99px;border:1px solid rgba(138,90,30,.45);color:var(--gold);background:rgba(236,223,194,.7)}
   .chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold-soft);margin-right:7px;vertical-align:1px}
   .chip.live .dot{background:var(--green)}
   .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
-  .btn{font-family:var(--sans);font-size:.92rem;font-weight:600;letter-spacing:.02em;border-radius:12px;padding:12px 22px;border:1px solid rgba(240,196,100,.5);background:linear-gradient(180deg,rgba(240,196,100,.16),rgba(240,196,100,.05));color:var(--gold);cursor:pointer;text-decoration:none;display:inline-block;transition:transform .12s ease, box-shadow .12s ease}
-  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(240,196,100,.15)}
+  .btn{font-family:var(--sans);font-size:.92rem;font-weight:600;letter-spacing:.02em;border-radius:12px;padding:12px 22px;border:1px solid rgba(138,90,30,.55);background:linear-gradient(180deg,rgba(138,90,30,.14),rgba(138,90,30,.05));color:var(--gold);cursor:pointer;text-decoration:none;display:inline-block;transition:transform .12s ease, box-shadow .12s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(91,70,51,.22)}
   .btn.primary{background:linear-gradient(180deg,#f0c464,#d9a84e);color:var(--night);border-color:#f0c464}
-  .btn.ghost{background:transparent;border-color:rgba(247,236,217,.25);color:var(--cream-dim)}
+  .btn.ghost{background:transparent;border-color:rgba(59,44,30,.35);color:var(--cream-dim)}
   .btn.small{padding:7px 14px;font-size:.8rem;border-radius:9px}
-  .btn.danger{border-color:rgba(232,106,146,.55);color:var(--rose);background:linear-gradient(180deg,rgba(232,106,146,.14),rgba(232,106,146,.04))}
+  .btn.danger{border-color:rgba(161,58,78,.55);color:var(--rose);background:linear-gradient(180deg,rgba(161,58,78,.14),rgba(161,58,78,.04))}
   .btn:disabled,.btn.disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 
   /* ── generic sections / cards (whitepaper language) ── */
@@ -115,20 +118,20 @@ window.OSO_PAD_CONFIG = {
   h3{font-size:1.15rem;color:var(--cream);margin:26px 0 6px}
   p{margin-bottom:14px;color:var(--cream-dim)}
   p b{color:var(--cream)}
-  .card{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:20px 22px;margin:16px 0}
+  .card{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:20px 22px;margin:16px 0}
   .card h3{margin-top:0;color:var(--gold)}
-  .receipt{font-family:var(--mono);font-size:.86rem;background:rgba(11,6,18,.7);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 10px 10px 0;color:var(--cream-dim);margin:10px 0;overflow-wrap:anywhere}
-  .receipt b{color:var(--green)}
+  .receipt{font-family:var(--mono);font-size:.86rem;background:rgba(59,44,30,.92);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 10px 10px 0;color:#f2e6cf;margin:10px 0;overflow-wrap:anywhere}
+  .receipt b{color:#a8d69a}
   blockquote{border-left:3px solid var(--coral);padding:6px 0 6px 18px;margin:18px 0;font-style:italic;color:var(--cream-dim)}
   blockquote .who{display:block;font-style:normal;font-family:var(--sans);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-top:8px}
-  .tag{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid rgba(240,196,100,.4);color:var(--gold);margin-right:6px;vertical-align:middle}
-  .tag.green{border-color:rgba(126,224,163,.5);color:var(--green)}
-  .tag.rose{border-color:rgba(232,106,146,.5);color:var(--rose)}
-  .tag.coral{border-color:rgba(255,138,92,.5);color:var(--coral)}
+  .tag{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid rgba(138,90,30,.5);color:var(--gold);margin-right:6px;vertical-align:middle}
+  .tag.green{border-color:rgba(63,112,64,.5);color:var(--green)}
+  .tag.rose{border-color:rgba(161,58,78,.5);color:var(--rose)}
+  .tag.coral{border-color:rgba(176,80,42,.5);color:var(--coral)}
 
   /* ── receipts strip ── */
   .receipts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:30px 0 0}
-  .rcell{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:14px 16px}
+  .rcell{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:14px 16px}
   .rcell .big{font-size:1.45rem;color:var(--gold);font-weight:600;line-height:1.2}
   .rcell .lbl{font-family:var(--sans);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cream-faint);margin-top:4px}
 
@@ -136,7 +139,7 @@ window.OSO_PAD_CONFIG = {
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .form-grid .full{grid-column:1/-1}
   label.fl{display:block;font-family:var(--sans);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:5px}
-  input[type=text],input[type=url],textarea{width:100%;font-family:var(--mono);font-size:.9rem;color:var(--cream);background:rgba(11,6,18,.65);border:1px solid rgba(240,196,100,.25);border-radius:10px;padding:11px 13px;outline:none}
+  input[type=text],input[type=url],textarea{width:100%;font-family:var(--mono);font-size:.9rem;color:var(--cream);background:rgba(255,252,244,.8);border:1px solid rgba(138,90,30,.4);border-radius:10px;padding:11px 13px;outline:none}
   input[type=text]:focus,input[type=url]:focus,textarea:focus{border-color:var(--gold)}
   input::placeholder,textarea::placeholder{color:var(--cream-faint)}
   .form-note{font-size:.85rem;color:var(--cream-faint);font-style:italic;margin-top:4px}
@@ -145,8 +148,8 @@ window.OSO_PAD_CONFIG = {
 
   /* ── listings ── */
   .agents{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:18px 0}
-  .agent{position:relative;background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s ease}
-  .agent:hover{border-color:rgba(240,196,100,.45)}
+  .agent{position:relative;background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s ease}
+  .agent:hover{border-color:rgba(138,90,30,.55)}
   .agent.withdrawn{opacity:.62;border-style:dashed}
   .agent .crown{font-size:1.7rem;line-height:1}
   .agent .aname{font-size:1.3rem;font-weight:600;color:var(--cream)}
@@ -156,38 +159,49 @@ window.OSO_PAD_CONFIG = {
   .agent .meta b{color:var(--cream-dim);font-weight:400}
   .agent .badges{display:flex;flex-wrap:wrap;gap:6px}
   .consent{font-family:var(--sans);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px;border:1px solid}
-  .consent.active{color:var(--green);border-color:rgba(126,224,163,.5)}
-  .consent.paused{color:var(--gold);border-color:rgba(240,196,100,.5)}
-  .consent.withdrawn{color:var(--rose);border-color:rgba(232,106,146,.55)}
-  .wbadge{font-family:var(--sans);font-size:.72rem;letter-spacing:.08em;padding:3px 11px;border-radius:99px;border:1px solid rgba(126,224,163,.55);color:var(--green)}
-  .wbadge.unverified{border-color:rgba(247,236,217,.2);color:var(--cream-faint)}
-  .agent .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid rgba(240,196,100,.12)}
+  .consent.active{color:var(--green);border-color:rgba(63,112,64,.5)}
+  .consent.paused{color:var(--gold);border-color:rgba(138,90,30,.55)}
+  .consent.withdrawn{color:var(--rose);border-color:rgba(161,58,78,.55)}
+  .wbadge{font-family:var(--sans);font-size:.72rem;letter-spacing:.08em;padding:3px 11px;border-radius:99px;border:1px solid rgba(63,112,64,.55);color:var(--green)}
+  .wbadge.unverified{border-color:rgba(59,44,30,.3);color:var(--cream-faint)}
+  .agent .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid rgba(138,90,30,.2)}
   .preview-flag{position:absolute;top:12px;right:14px;font-family:var(--sans);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cream-faint)}
 
   /* ── consent modal ── */
-  .modal-back{position:fixed;inset:0;background:rgba(11,6,18,.82);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:90;padding:22px}
+  .modal-back{position:fixed;inset:0;background:rgba(43,31,20,.5);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:90;padding:22px}
   .modal-back.open{display:flex}
-  .modal{max-width:520px;width:100%;background:linear-gradient(180deg,var(--deep),var(--plum));border:1px solid rgba(232,106,146,.4);border-radius:18px;padding:28px}
+  .modal{max-width:520px;width:100%;background:linear-gradient(180deg,var(--deep),var(--plum));border:1px solid rgba(161,58,78,.4);border-radius:18px;padding:28px}
   .modal h3{color:var(--rose);margin:0 0 8px;font-size:1.3rem}
-  .modal .word{font-family:var(--mono);color:var(--rose);background:rgba(232,106,146,.12);padding:1px 8px;border-radius:6px}
+  .modal .word{font-family:var(--mono);color:var(--rose);background:rgba(161,58,78,.12);padding:1px 8px;border-radius:6px}
 
   /* ── pulse ── */
-  .pulse-frame{width:100%;min-height:420px;border:1px solid rgba(240,196,100,.22);border-radius:16px;background:rgba(11,6,18,.55);overflow:hidden}
+  .pulse-frame{width:100%;min-height:420px;border:1px solid rgba(138,90,30,.35);border-radius:16px;background:rgba(251,246,234,.65);overflow:hidden}
   .pulse-frame iframe{width:100%;height:420px;border:0;display:block}
   .pulse-placeholder{padding:56px 22px;text-align:center;font-style:italic;color:var(--cream-faint)}
 
   /* ── toast ── */
-  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:rgba(21,11,34,.96);border:1px solid rgba(240,196,100,.4);color:var(--cream);font-family:var(--sans);font-size:.88rem;padding:12px 20px;border-radius:12px;transition:all .25s ease;z-index:99;max-width:min(92vw,560px);text-align:center}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:rgba(43,31,20,.96);border:1px solid rgba(138,90,30,.5);color:#f7ecd9;font-family:var(--sans);font-size:.88rem;padding:12px 20px;border-radius:12px;transition:all .25s ease;z-index:99;max-width:min(92vw,560px);text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .toast.err{border-color:rgba(232,106,146,.6)}
+  .toast.err{border-color:rgba(161,58,78,.6)}
 
   /* ── footer ── */
   .integrations{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
-  .intg{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:12px;padding:12px 14px;font-family:var(--sans);font-size:.82rem;color:var(--cream-dim)}
+  .intg{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:12px;padding:12px 14px;font-family:var(--sans);font-size:.82rem;color:var(--cream-dim)}
   .intg b{display:block;color:var(--gold);font-size:.9rem;margin-bottom:2px}
   .intg .role{color:var(--cream-faint);font-size:.74rem}
-  .foot{margin-top:64px;padding-top:22px;border-top:1px solid rgba(240,196,100,.2);font-family:var(--sans);font-size:.8rem;color:var(--cream-faint)}
+  .foot{margin-top:64px;padding-top:22px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.8rem;color:var(--cream-faint)}
   .circ{font-size:1.02rem;color:var(--cream-dim);font-style:italic;text-align:center;margin:34px auto 0;max-width:640px}
+
+  /* ── ancient-page skin: kapa (tapa) pattern strips + honu ── */
+  .topbar::after,.hero::after,.foot::before{content:"";display:block;height:8px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8}
+  .hero::after{margin-top:34px}
+  .foot::before{margin:-22px 0 22px}
+  .card,.agent{position:relative;overflow:hidden}
+  .card::before,.agent::before{content:"";display:block;height:8px;margin:-20px -22px 16px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+  .agent::before{margin:-20px -20px 12px}
+  .rcell,.intg{border-top:3px double #7a4a21}
+  .honu{position:absolute;right:-8px;top:34px;width:230px;color:#7a4a21;opacity:.17;pointer-events:none}
+  @media (max-width:760px){.honu{display:none}}
 
   @media (max-width:640px){
     .form-grid{grid-template-columns:1fr}
@@ -199,7 +213,7 @@ window.OSO_PAD_CONFIG = {
 
 <div class="topbar">
   <div class="inner">
-    <a class="wordmark" href="#top">My Agent <em>ʻOhana</em> 🌺</a>
+    <a class="wordmark" href="#top"><img class="brand" src="../assets/logo-flower.png" alt="My Agent ʻOhana plumeria logo">My Agent <em>ʻOhana</em></a>
     <nav class="topnav">
       <a href="#launch">Launch</a>
       <a href="#launched">Launched ʻOhana</a>
@@ -214,6 +228,7 @@ window.OSO_PAD_CONFIG = {
 
   <!-- ───────────────────────── HERO ───────────────────────── -->
   <header class="hero">
+    <div class="honu" aria-hidden="true"><svg viewBox="0 0 220 170" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="110" cy="92" rx="54" ry="42"/><path d="M110 50 L110 134 M62 92 L158 92"/><path d="M78 63 L142 121 M142 63 L78 121"/><circle cx="110" cy="34" r="13"/><path d="M63 66 Q34 56 24 30 Q52 36 70 54"/><path d="M157 66 Q186 56 196 30 Q168 36 150 54"/><path d="M70 122 Q50 140 48 156 Q66 150 80 132"/><path d="M150 122 Q170 140 172 156 Q154 150 140 132"/></g><g fill="currentColor" opacity=".55"><path d="M110 66 l12 18 -12 -5 -12 5 z"/><path d="M76 88 l10 15 -10 -4 -10 4 z"/><path d="M144 88 l10 15 -10 -4 -10 4 z"/><circle cx="106" cy="32" r="1.6"/><circle cx="114" cy="32" r="1.6"/></g></svg></div>
     <div class="kicker">ETHOnline 2026 · Classic From-Scratch · the tri-protocol launchpad</div>
     <h1>My Agent ʻOhana <em>— launch your agent ʻohana to three chains at once</em></h1>
     <p class="lede">Launch an agent like launching a token — except every launch includes <b>identity, consent, and a first job</b>. One ceremony, three markets: our own on <b>ETH</b>, our L2 on <b>BASE</b>, and the honored <b>BNB</b> lane that inspired us.</p>

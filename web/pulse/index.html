@@ -5,59 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PULSE OF THE ʻOHANA 🫀🌺 — the live nervous system of the pad</title>
 <meta name="description" content="Live launches, consent flips, hires and blessings from the AgentLaunchRegistry — indexed by The Graph. The Pulse of the ʻOhana.">
+<link rel="icon" type="image/png" href="../../assets/logo-flower.png">
 <style>
   :root{
-    --night:#0b0612; --deep:#150b22; --violet:#2a1740; --plum:#3d1c42;
-    --cream:#f7ecd9; --cream-dim:rgba(247,236,217,.72); --cream-faint:rgba(247,236,217,.5);
-    --gold:#f0c464; --gold-soft:rgba(240,196,100,.35); --coral:#ff8a5c; --rose:#e86a92; --green:#7ee0a3;
+    --night:#2c1f12; --deep:#f6eeda; --violet:#fbf6ea; --plum:#ecdfc0;
+    --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --gold-soft:rgba(138,90,30,.3); --coral:#b0502a; --rose:#a13a4e; --green:#3f7040;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
     --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
     --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:var(--serif);color:var(--cream);background:linear-gradient(180deg,var(--night) 0%,var(--deep) 45%,#241128 100%);line-height:1.65;min-height:100vh}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.65;min-height:100vh}
   .wrap{max-width:1080px;margin:0 auto;padding:40px 20px 80px}
   a{color:var(--gold)}
   .kicker{font-family:var(--sans);font-size:.75rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
   h1{font-size:clamp(1.9rem,6vw,2.9rem);line-height:1.12;font-weight:600;margin-bottom:6px}
-  h1 em{color:var(--gold);font-style:italic}
+  h1 em{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
   .lede{color:var(--cream-dim);font-style:italic;margin-bottom:18px}
   .badge{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px;border:1px solid;vertical-align:middle;margin-left:10px}
-  .badge.live{border-color:rgba(126,224,163,.6);color:var(--green)}
-  .badge.mock{border-color:rgba(255,138,92,.7);color:var(--coral);animation:pulse 2s infinite}
+  .badge.live{border-color:rgba(63,112,64,.6);color:var(--green)}
+  .badge.mock{border-color:rgba(176,80,42,.7);color:var(--coral);animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-  .mockbar{font-family:var(--sans);font-size:.85rem;background:rgba(255,138,92,.12);border:1px solid rgba(255,138,92,.45);border-radius:12px;padding:10px 16px;margin:14px 0;color:var(--coral)}
+  .mockbar{font-family:var(--sans);font-size:.85rem;background:rgba(176,80,42,.12);border:1px solid rgba(176,80,42,.45);border-radius:12px;padding:10px 16px;margin:14px 0;color:var(--coral)}
   .mockbar b{color:var(--gold)}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:22px 0}
-  .stat{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:14px 16px;text-align:center}
+  .stat{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:14px 16px;text-align:center}
   .stat .v{font-family:var(--sans);font-weight:700;font-size:1.55rem;color:var(--gold)}
   .stat .l{font-family:var(--sans);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-faint);margin-top:2px}
   h2{font-size:1.25rem;color:var(--gold);font-weight:600;margin:38px 0 12px;display:flex;align-items:baseline;gap:10px}
   h2 .num{font-family:var(--sans);font-size:.72rem;color:var(--coral);letter-spacing:.12em}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-  .agent{background:rgba(42,23,64,.45);border:1px solid rgba(240,196,100,.18);border-radius:14px;padding:16px 18px;position:relative}
-  .agent.delisted{opacity:.55;border-color:rgba(232,106,146,.4)}
+  .agent{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:16px 18px;position:relative}
+  .agent.delisted{opacity:.55;border-color:rgba(161,58,78,.4)}
   .agent .nm{font-size:1.1rem;color:var(--cream);font-weight:600}
   .agent .ens{font-family:var(--mono);font-size:.78rem;color:var(--gold);margin-top:2px;word-break:break-all}
   .agent .ep{font-family:var(--mono);font-size:.72rem;color:var(--cream-faint);margin-top:2px;word-break:break-all}
   .agent .meta{font-family:var(--sans);font-size:.75rem;color:var(--cream-dim);margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
   .chip{display:inline-block;font-family:var(--sans);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid}
-  .chip.active{border-color:rgba(126,224,163,.5);color:var(--green)}
-  .chip.paused{border-color:rgba(240,196,100,.5);color:var(--gold)}
-  .chip.withdrawn{border-color:rgba(232,106,146,.5);color:var(--rose)}
-  .chip.unknown{border-color:rgba(247,236,217,.3);color:var(--cream-faint)}
-  .chip.delisted{border-color:rgba(232,106,146,.7);color:var(--rose);background:rgba(232,106,146,.12)}
-  .chip.ens{border-color:rgba(240,196,100,.5);color:var(--gold)}
+  .chip.active{border-color:rgba(63,112,64,.5);color:var(--green)}
+  .chip.paused{border-color:rgba(138,90,30,.55);color:var(--gold)}
+  .chip.withdrawn{border-color:rgba(161,58,78,.5);color:var(--rose)}
+  .chip.unknown{border-color:rgba(59,44,30,.32);color:var(--cream-faint)}
+  .chip.delisted{border-color:rgba(161,58,78,.7);color:var(--rose);background:rgba(161,58,78,.12)}
+  .chip.ens{border-color:rgba(138,90,30,.55);color:var(--gold)}
   .feed{display:flex;flex-direction:column;gap:8px}
-  .ev{display:flex;gap:12px;align-items:flex-start;background:rgba(42,23,64,.35);border:1px solid rgba(240,196,100,.12);border-radius:12px;padding:10px 14px}
+  .ev{display:flex;gap:12px;align-items:flex-start;background:rgba(251,246,234,.78);border:1px solid rgba(138,90,30,.2);border-radius:12px;padding:10px 14px}
   .ev .ic{font-size:1.05rem;flex-shrink:0;margin-top:1px}
   .ev .tx{font-size:.95rem;color:var(--cream-dim);word-break:break-word}
   .ev .tx b{color:var(--cream)}
   .ev .tm{font-family:var(--sans);font-size:.72rem;color:var(--cream-faint);white-space:nowrap;margin-left:auto;flex-shrink:0}
-  .foot{margin-top:52px;padding-top:18px;border-top:1px solid rgba(240,196,100,.2);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
+  .foot{margin-top:52px;padding-top:18px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
   .foot code{font-family:var(--mono);font-size:.72rem;word-break:break-all}
   .circ{font-style:italic;color:var(--cream-dim);text-align:center;margin:30px auto 0;max-width:620px;font-size:.98rem}
-  .err{background:rgba(232,106,146,.1);border:1px solid rgba(232,106,146,.4);border-radius:12px;padding:10px 16px;font-family:var(--sans);font-size:.82rem;color:var(--rose);margin:12px 0}
+  .err{background:rgba(161,58,78,.1);border:1px solid rgba(161,58,78,.4);border-radius:12px;padding:10px 16px;font-family:var(--sans);font-size:.82rem;color:var(--rose);margin:12px 0}
+  /* ── ancient-page skin: kapa (tapa) pattern strips ── */
+  .wrap::before,.foot::before{content:"";display:block;height:10px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8}
+  .wrap::before{margin:-16px 0 24px}
+  .foot::before{margin:-18px 0 18px;height:8px}
+  .agent{overflow:hidden}
+  .agent::before{content:"";display:block;height:7px;margin:-16px -18px 12px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
 </style>
 </head>
 <body>
