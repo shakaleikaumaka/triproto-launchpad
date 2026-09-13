@@ -32,7 +32,9 @@ p b{color:var(--ink)}
 blockquote{border-left:3px solid var(--coral);padding:6px 0 6px 16px;margin:16px 0;font-style:italic;color:var(--ink2);background:linear-gradient(90deg,rgba(192,57,43,.06),transparent)}
 blockquote .who{display:block;font-style:normal;font-family:var(--sans);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--coral);margin-top:6px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin:12px 0}
-.card{background:rgba(255,252,244,.7);border:1px solid rgba(122,74,33,.4);border-radius:10px;padding:14px 16px}
+.card{background:rgba(255,252,244,.7);border:1px solid rgba(122,74,33,.4);border-radius:10px;padding:14px 16px;overflow:hidden;overflow-wrap:anywhere}
+.card p,.card h3,.card code,ul li,ol li,.wrap p{overflow-wrap:anywhere;word-break:break-word}
+a{overflow-wrap:anywhere;word-break:break-word}
 .card h3{margin:0 0 4px;color:var(--koa);font-size:1rem}
 .kapa{display:block;height:8px;border:0;border-top:6px solid var(--brick);border-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='8'%3E%3Cpath d='M0 8L48 0l16 8L64 0' fill='none'/%3E%3C/svg%3E") 30}
 .footer{margin-top:60px;padding-top:16px;border-top:2px solid var(--brick);font-family:var(--sans);font-size:.76rem;color:var(--ink2)}
