@@ -38,7 +38,7 @@ Facts checked (tarballs downloaded and read, not just metadata):
     `0x64544969ed7EBf5f083679233325356EbE738930`.
 - **⚠️ Concern reported (gate ⑦ honesty)**: the CLI ships a **hardcoded shared
   ASI1 API key fallback** in `create.js`
-  (`sk_2a3c92a0b11e4f18b50708cca1a55179ab38a7c2fb7f4eee95fd68e1e28f860b`) used
+  (`sk_2a3c92a0…[masked]`) used
   when `ASI1_API_KEY` env is unset by scaffolding users. It's a credential baked
   into a public package — poor hygiene, though only affecting the `create`
   scaffolder, which this lane never invokes. Flagged for upstream.

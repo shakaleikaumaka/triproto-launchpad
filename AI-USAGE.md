@@ -26,3 +26,6 @@ The build runs in declared **lanes**, each owning disjoint paths (see `LANES.md`
 
 - The vendored `web/vendor/ethers-6.15.0.min.js` is the **official ethers v6.15.0 ESM build** (unmodified upstream library, allowed per Classic track rules as a pre-existing public library).
 - The tri-protocol concept, the Standing Consent Window, the $0.0042 census receipt, and the agents themselves are **pre-existing ʻohana assets** — disclosed here and in `SUBMISSION.md`, not presented as in-window work.
+
+- Lane SDK (integrations/fetch-cli): SDK-automation for BNB FET launch (dry-run gates, CROPS-checked)
+- Lane CROPS: independent review (docs/crops-review-say.md)
