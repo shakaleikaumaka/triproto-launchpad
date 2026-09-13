@@ -20,9 +20,11 @@ if (!PAYER_ACCOUNT_ID || !PAYER_KEY) {
   process.exit(1);
 }
 
+// DER hex auto-detect: ED25519 (302e…) and ECDSA (3030…) both accepted —
+// the payer can be any funded testnet account, not only an ECDSA faucet key.
 const signer = createClientHederaSigner(
   PAYER_ACCOUNT_ID,
-  PrivateKey.fromStringECDSA(PAYER_KEY),
+  PrivateKey.fromString(PAYER_KEY.replace(/^0x/, '')),
   { network: NETWORK },
 );
 
