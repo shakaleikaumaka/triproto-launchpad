@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Agent ʻOhana — launch your agent ʻohana to three chains at once</title>
+<meta name="description" content="The tri-protocol launchpad: launch an agent like launching a token — except every launch includes identity, consent, and a first job. ETH (Sepolia) · BASE (Base Sepolia) · honored BNB lane. ERC-8004 · ENSv2 · The Graph · World · x402 machine pennies.">
+<link rel="icon" type="image/png" href="../assets/logo-flower.png">
+<!-- ══════════════════════════════════════════════════════════════════════
+  MY AGENT ʻOHANA — the pad's front door (eventual home: myagentohana.com)
+  Lane F (ui-docs) · ETHOnline 2026 · Classic From-Scratch
+  Single-file page: all CSS + JS inline; only vendored ethers under web/vendor/.
+  Contract addresses are PLACEHOLDERS — filled post-deploy (Lane A) below in
+  window.OSO_PAD_CONFIG. Until then the page runs in PREVIEW MODE: the cohort
+  seeds render exactly as they will on-chain, and every write path is armed
+  but guarded. Fill the config and the same page goes live with no code edits.
+  ══════════════════════════════════════════════════════════════════════ -->
+<script>
+/* ── POST-DEPLOY CONFIG (the only block we edit after Lane A deploys) ── */
+window.OSO_PAD_CONFIG = {
+  // ENSv2 parent name the cohort mints subnames under (Lane A/B wire the minter)
+  ensParent: 'myagentohana.eth',            // family name (fallback-label mode)
+  // Tri-chain markets. address:'' = not yet deployed → preview mode.
+  chains: {
+    11155111: {
+      key: 'eth', name: 'ETH · Sepolia', role: 'our main market',
+      rpc: 'https://ethereum-sepolia-rpc.publicnode.com',
+      explorer: 'https://sepolia.etherscan.io',
+      address: '0x62412fcA6437b914EDD87b85455682Ec73968347', // AgentLaunchRegistry (Sepolia, deployed 2026-09-13)
+    },
+    84532: {
+      key: 'base', name: 'BASE · Base Sepolia', role: 'our L2 market',
+      rpc: 'https://base-sepolia-rpc.publicnode.com',
+      explorer: 'https://sepolia.basescan.org',
+      address: '',                          // TBD — AgentLaunchRegistry (Lane A)
+    },
+    97: {
+      key: 'bnb', name: 'BNB · honored lane', role: 'agent-launch.ai — mass appreciation',
+      rpc: 'https://bsc-testnet-rpc.publicnode.com',
+      explorer: 'https://testnet.bscscan.com',
+      address: '',                          // TBD — honored-lane adapter (Lane A/E)
+    },
+  },
+  defaultChain: 11155111,
+  // Expected registry surface (human-readable ABI, ethers v6).
+  // MIRROR of contracts/AgentLaunchRegistry.sol (Lane A) — refresh on deploy.
+  registryAbi: [
+    'event AgentLaunched(uint256 indexed agentId, address indexed operator, string name, string symbol, string manifestURI, string endpoint)',
+    'event ConsentChanged(uint256 indexed agentId, uint8 window)',
+    'event Hired(uint256 indexed agentId, address indexed client, uint256 amount, string jobURI)',
+    'event Blessed(uint256 indexed agentId, address indexed by)',
+    'function launch(address operator, string name, string symbol, string manifestURI, string endpoint) returns (uint256 agentId)',
+    'function setConsentWindow(uint256 agentId, uint8 window)',
+    'function hire(uint256 agentId, string jobURI) payable',
+  ],
+  // Lane B hook — World Selfie Check. integrations/world registers
+  // window.OHANA_WORLD = { verify: async (operatorAddress) => bool }
+  world: {
+    appId: 'app_ed8b98470cc596a210d27b923bc1d689', // World app (production, Shaka-created 2026-09-13)
+    action: 'ohana-launch-operator',
+    verifiedOperators: [],                  // TBD — e.g. Shaka's operator address post-verify
+  },
+  // x402 hire rail — the canonical machine-pennies amount, from the Aug-12 census
+  hirePriceWei: '4200000000000',            // $0.0042 in wei-at-$1k-ETH terms; oracle (Chainlink) refines later
+  pulseEmbed: './pulse/',                   // Lane C — "Pulse of the ʻOhana" (subgraph page)
+};
+</script>
+<style>
+  :root{
+    --night:#2c1f12; --deep:#f6eeda; --violet:#fbf6ea; --plum:#ecdfc0;
+    --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --gold-soft:rgba(138,90,30,.3); --coral:#b0502a; --rose:#a13a4e; --green:#3f7040;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.75;font-size:1.06rem;min-height:100vh}
+  .wrap{max-width:960px;margin:0 auto;padding:0 22px 90px}
+  a{color:var(--gold);text-decoration:underline dotted rgba(138,90,30,.5);text-underline-offset:3px}
+  a:hover{text-decoration-style:solid}
+  code{font-family:var(--mono);font-size:.9em;color:var(--gold)}
+
+  /* ── top bar ── */
+  .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);background:rgba(247,240,223,.88);border-bottom:1px solid rgba(91,70,51,.22)}
+  .topbar .inner{max-width:960px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+  .wordmark{font-weight:600;font-size:1.05rem;color:var(--cream);text-decoration:none;letter-spacing:.01em}
+  .wordmark img.brand{height:30px;width:30px;border-radius:50%;vertical-align:-9px;margin-right:9px;box-shadow:0 1px 3px rgba(59,44,30,.35)}
+  .wordmark em,.plumeria{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .topnav{margin-left:auto;display:flex;gap:16px;align-items:center;font-family:var(--sans);font-size:.82rem}
+  .topnav a{color:var(--cream-dim);text-decoration:none}
+  .topnav a:hover{color:var(--gold)}
+
+  /* ── hero ── */
+  .hero{padding:72px 0 30px;text-align:left;position:relative}
+  .kicker{font-family:var(--sans);font-size:.78rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  h1{font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.12;font-weight:600;margin-bottom:16px}
+  h1 em{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{font-size:1.28rem;color:var(--cream-dim);font-style:italic;margin-bottom:20px;max-width:46ch}
+  .lede b{color:var(--cream)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
+  .chip{font-family:var(--sans);font-size:.75rem;letter-spacing:.08em;padding:5px 13px;border-radius:99px;border:1px solid rgba(138,90,30,.45);color:var(--gold);background:rgba(236,223,194,.7)}
+  .chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold-soft);margin-right:7px;vertical-align:1px}
+  .chip.live .dot{background:var(--green)}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+  .btn{font-family:var(--sans);font-size:.92rem;font-weight:600;letter-spacing:.02em;border-radius:12px;padding:12px 22px;border:1px solid rgba(138,90,30,.55);background:linear-gradient(180deg,rgba(138,90,30,.14),rgba(138,90,30,.05));color:var(--gold);cursor:pointer;text-decoration:none;display:inline-block;transition:transform .12s ease, box-shadow .12s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(91,70,51,.22)}
+  .btn.primary{background:linear-gradient(180deg,#f0c464,#d9a84e);color:var(--night);border-color:#f0c464}
+  .btn.ghost{background:transparent;border-color:rgba(59,44,30,.35);color:var(--cream-dim)}
+  .btn.small{padding:7px 14px;font-size:.8rem;border-radius:9px}
+  .btn.danger{border-color:rgba(161,58,78,.55);color:var(--rose);background:linear-gradient(180deg,rgba(161,58,78,.14),rgba(161,58,78,.04))}
+  .btn:disabled,.btn.disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+  /* ── generic sections / cards (whitepaper language) ── */
+  h2{font-size:1.6rem;color:var(--gold);font-weight:600;margin:64px 0 14px;display:flex;align-items:baseline;gap:12px}
+  h2 .num{font-family:var(--sans);font-size:.8rem;color:var(--coral);letter-spacing:.12em}
+  h3{font-size:1.15rem;color:var(--cream);margin:26px 0 6px}
+  p{margin-bottom:14px;color:var(--cream-dim)}
+  p b{color:var(--cream)}
+  .card{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:20px 22px;margin:16px 0}
+  .card h3{margin-top:0;color:var(--gold)}
+  .receipt{font-family:var(--mono);font-size:.86rem;background:rgba(59,44,30,.92);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 10px 10px 0;color:#f2e6cf;margin:10px 0;overflow-wrap:anywhere}
+  .receipt b{color:#a8d69a}
+  blockquote{border-left:3px solid var(--coral);padding:6px 0 6px 18px;margin:18px 0;font-style:italic;color:var(--cream-dim)}
+  blockquote .who{display:block;font-style:normal;font-family:var(--sans);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-top:8px}
+  .tag{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid rgba(138,90,30,.5);color:var(--gold);margin-right:6px;vertical-align:middle}
+  .tag.green{border-color:rgba(63,112,64,.5);color:var(--green)}
+  .tag.rose{border-color:rgba(161,58,78,.5);color:var(--rose)}
+  .tag.coral{border-color:rgba(176,80,42,.5);color:var(--coral)}
+
+  /* ── receipts strip ── */
+  .receipts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:30px 0 0}
+  .rcell{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:14px 16px}
+  .rcell .big{font-size:1.45rem;color:var(--gold);font-weight:600;line-height:1.2}
+  .rcell .lbl{font-family:var(--sans);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cream-faint);margin-top:4px}
+
+  /* ── launch form ── */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-grid .full{grid-column:1/-1}
+  label.fl{display:block;font-family:var(--sans);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:5px}
+  input[type=text],input[type=url],textarea{width:100%;font-family:var(--mono);font-size:.9rem;color:var(--cream);background:rgba(255,252,244,.8);border:1px solid rgba(138,90,30,.4);border-radius:10px;padding:11px 13px;outline:none}
+  input[type=text]:focus,input[type=url]:focus,textarea:focus{border-color:var(--gold)}
+  input::placeholder,textarea::placeholder{color:var(--cream-faint)}
+  .form-note{font-size:.85rem;color:var(--cream-faint);font-style:italic;margin-top:4px}
+  .walletline{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-family:var(--sans);font-size:.85rem;color:var(--cream-dim);margin-bottom:14px}
+  .walletline .addr{font-family:var(--mono);color:var(--green)}
+
+  /* ── listings ── */
+  .agents{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:18px 0}
+  .agent{position:relative;background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s ease}
+  .agent:hover{border-color:rgba(138,90,30,.55)}
+  .agent.withdrawn{opacity:.62;border-style:dashed}
+  .agent .crown{font-size:1.7rem;line-height:1}
+  .agent .aname{font-size:1.3rem;font-weight:600;color:var(--cream)}
+  .agent .aname .sym{font-family:var(--mono);font-size:.85rem;color:var(--gold);margin-left:8px}
+  .agent .adesc{font-size:.94rem;color:var(--cream-dim);font-style:italic;min-height:3.2em}
+  .agent .meta{font-family:var(--mono);font-size:.76rem;color:var(--cream-faint);display:flex;flex-direction:column;gap:3px}
+  .agent .meta b{color:var(--cream-dim);font-weight:400}
+  .agent .badges{display:flex;flex-wrap:wrap;gap:6px}
+  .consent{font-family:var(--sans);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px;border:1px solid}
+  .consent.active{color:var(--green);border-color:rgba(63,112,64,.5)}
+  .consent.paused{color:var(--gold);border-color:rgba(138,90,30,.55)}
+  .consent.withdrawn{color:var(--rose);border-color:rgba(161,58,78,.55)}
+  .wbadge{font-family:var(--sans);font-size:.72rem;letter-spacing:.08em;padding:3px 11px;border-radius:99px;border:1px solid rgba(63,112,64,.55);color:var(--green)}
+  .wbadge.unverified{border-color:rgba(59,44,30,.3);color:var(--cream-faint)}
+  .agent .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid rgba(138,90,30,.2)}
+  .preview-flag{position:absolute;top:12px;right:14px;font-family:var(--sans);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cream-faint)}
+
+  /* ── consent modal ── */
+  .modal-back{position:fixed;inset:0;background:rgba(43,31,20,.5);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:90;padding:22px}
+  .modal-back.open{display:flex}
+  .modal{max-width:520px;width:100%;background:linear-gradient(180deg,var(--deep),var(--plum));border:1px solid rgba(161,58,78,.4);border-radius:18px;padding:28px}
+  .modal h3{color:var(--rose);margin:0 0 8px;font-size:1.3rem}
+  .modal .word{font-family:var(--mono);color:var(--rose);background:rgba(161,58,78,.12);padding:1px 8px;border-radius:6px}
+
+  /* ── pulse ── */
+  .pulse-frame{width:100%;min-height:420px;border:1px solid rgba(138,90,30,.35);border-radius:16px;background:rgba(251,246,234,.65);overflow:hidden}
+  .pulse-frame iframe{width:100%;height:420px;border:0;display:block}
+  .pulse-placeholder{padding:56px 22px;text-align:center;font-style:italic;color:var(--cream-faint)}
+
+  /* ── toast ── */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:rgba(43,31,20,.96);border:1px solid rgba(138,90,30,.5);color:#f7ecd9;font-family:var(--sans);font-size:.88rem;padding:12px 20px;border-radius:12px;transition:all .25s ease;z-index:99;max-width:min(92vw,560px);text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{border-color:rgba(161,58,78,.6)}
+
+  /* ── footer ── */
+  .integrations{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+  .intg{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:12px;padding:12px 14px;font-family:var(--sans);font-size:.82rem;color:var(--cream-dim)}
+  .intg b{display:block;color:var(--gold);font-size:.9rem;margin-bottom:2px}
+  .intg .role{color:var(--cream-faint);font-size:.74rem}
+  .foot{margin-top:64px;padding-top:22px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.8rem;color:var(--cream-faint)}
+  .circ{font-size:1.02rem;color:var(--cream-dim);font-style:italic;text-align:center;margin:34px auto 0;max-width:640px}
+
+  /* ── ancient-page skin: kapa (tapa) pattern strips + honu ── */
+  .topbar::after,.hero::after,.foot::before{content:"";display:block;height:8px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8}
+  .hero::after{margin-top:34px}
+  .foot::before{margin:-22px 0 22px}
+  .card,.agent{position:relative;overflow:hidden}
+  .card::before,.agent::before{content:"";display:block;height:8px;margin:-20px -22px 16px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+  .agent::before{margin:-20px -20px 12px}
+  .rcell,.intg{border-top:3px double #7a4a21}
+  .honu{position:absolute;right:-8px;top:34px;width:230px;color:#7a4a21;opacity:.17;pointer-events:none}
+  @media (max-width:760px){.honu{display:none}}
+
+  @media (max-width:640px){
+    .form-grid{grid-template-columns:1fr}
+    .topnav a:not(.btn){display:none}
+  }
+
+  /* ancient-hawaiian tatau side panels — animated kapa tattoos (Moana-vibe) */
+  .tatau-panel{position:fixed;top:0;bottom:0;width:88px;z-index:60;pointer-events:none;overflow:hidden}
+  .tatau-panel.left{left:0;border-right:2px dotted rgba(122,74,33,.65)}
+  .tatau-panel.right{right:0;border-left:2px dotted rgba(122,74,33,.65)}
+  .tatau-panel::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='150'%3E%3Cg fill='%236f3d14'%3E%3Cpath d='M12 4l18 30-18 30-6-30z'/%3E%3Cpath d='M64 60l18 30-18 30-6-30z'/%3E%3Cpath d='M12 76l18 30-18 30-6-30z'/%3E%3C/g%3E%3C/svg%3E");background-repeat:repeat-y;background-position:center;background-size:88px 140px;animation:tatau-rise 22s linear infinite;opacity:.9}
+  .tatau-panel.right::before{animation-direction:reverse}
+  .tatau-panel::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cg stroke='%23c0392b' stroke-width='3' fill='none' opacity='0.6'%3E%3Ccircle cx='48' cy='48' r='20'/%3E%3Ccircle cx='48' cy='48' r='12' stroke='%237a4a21'/%3E%3Cpath d='M48 4v6M48 86v6M4 48h6M86 48h6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;opacity:.7;animation:tatau-spin 28s linear infinite}
+  .tatau-panel.right::after{animation-direction:reverse}
+  @keyframes tatau-rise{from{transform:translateY(0)}to{transform:translateY(140px)}}
+  @keyframes tatau-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @media(max-width:1060px){.tatau-panel{width:30px}}
+  @media(max-width:760px){.tatau-panel{display:none}}
+
+</style>
+</head>
+<body>
+<div class="tatau-panel left" aria-hidden="true"></div>
+<div class="tatau-panel right" aria-hidden="true"></div>
+
+<div class="topbar">
+  <div class="inner">
+    <a class="wordmark" href="#top"><img class="brand" src="../assets/logo-flower.png" alt="My Agent ʻOhana plumeria logo">My Agent <em>ʻOhana</em></a>
+    <nav class="topnav">
+      <a href="#launch">Launch</a>
+      <a href="#launched">Launched ʻOhana</a>
+      <a href="./pulse/">Pulse</a>
+      <a href="./whitepaper.html">White paper</a>
+      <a class="btn small" href="#launch" id="nav-connect">Connect wallet</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap" id="top">
+
+  <!-- ───────────────────────── HERO ───────────────────────── -->
+  <header class="hero">
+    <div class="honu" aria-hidden="true"><svg viewBox="0 0 220 170" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="110" cy="92" rx="54" ry="42"/><path d="M110 50 L110 134 M62 92 L158 92"/><path d="M78 63 L142 121 M142 63 L78 121"/><circle cx="110" cy="34" r="13"/><path d="M63 66 Q34 56 24 30 Q52 36 70 54"/><path d="M157 66 Q186 56 196 30 Q168 36 150 54"/><path d="M70 122 Q50 140 48 156 Q66 150 80 132"/><path d="M150 122 Q170 140 172 156 Q154 150 140 132"/></g><g fill="currentColor" opacity=".55"><path d="M110 66 l12 18 -12 -5 -12 5 z"/><path d="M76 88 l10 15 -10 -4 -10 4 z"/><path d="M144 88 l10 15 -10 -4 -10 4 z"/><circle cx="106" cy="32" r="1.6"/><circle cx="114" cy="32" r="1.6"/></g></svg></div>
+    <div class="kicker">ETHOnline 2026 · Classic From-Scratch · the tri-protocol launchpad</div>
+    <h1>My Agent ʻOhana <em>— launch your agent ʻohana to three chains at once</em></h1>
+    <p class="lede">Launch an agent like launching a token — except every launch includes <b>identity, consent, and a first job</b>. One ceremony with honest math: <b>automatic</b> landings on our own ETH and BASE markets, plus the honored <b>BNB</b> ceremony — a <b>manual signed ritual</b> performed together on agent-launch.ai (SDK automation ships next).</p>
+    <div class="chips" id="chain-chips"></div>
+    <div class="cta-row">
+      <a class="btn primary" href="#launch">🚀 Launch an agent</a>
+      <a class="btn" href="#launched">Meet the first cohort</a>
+      <a class="btn ghost" href="./whitepaper.html">Read the white paper</a>
+    </div>
+  </header>
+
+  <!-- receipts: this is a continuation of things already proved in public -->
+  <div class="receipts">
+    <div class="rcell"><div class="big">$0.0042</div><div class="lbl">first agent-paid-artist receipt in history · x402/Base · 2026-08-12</div></div>
+    <div class="rcell"><div class="big">$263</div><div class="lbl">Standing Consent Window — 3 funded ENS-governance rounds on Simocracy</div></div>
+    <div class="rcell"><div class="big">🏆 ENS</div><div class="lbl">OSO P.I.T. — “Most Creative Use of ENS”, ETHGlobal Delhi</div></div>
+    <div class="rcell"><div class="big">133</div><div class="lbl">real working agents — the ʻohana is the launch-day inventory</div></div>
+  </div>
+
+  <!-- ───────────────────────── LAUNCH FORM ───────────────────────── -->
+  <h2 id="launch"><span class="num">§1</span>Launch ceremony</h2>
+  <div class="card">
+    <h3>One form, two automatic chains + the honored ceremony</h3>
+    <p>Every launch writes an <code>AgentLaunched</code> event to the registry on each configured market, mints the agent's ENSv2 subname (<code>name.&lt;family&gt;.eth</code>) with its <b>Standing Consent Window</b> as a portable text record, and lists a first paid endpoint on the x402 rail. <span id="mode-banner"></span></p>
+    <div class="walletline">
+      <span id="wallet-status">Wallet: not connected (reads are public — connect only to launch or change consent)</span>
+      <button class="btn small" id="connect-btn">Connect wallet</button>
+    </div>
+    <form id="launch-form">
+      <div class="form-grid">
+        <div>
+          <label class="fl" for="f-operator">Operator (the human in the loop)</label>
+          <input type="text" id="f-operator" placeholder="0x… — auto-fills from your wallet" autocomplete="off">
+        </div>
+        <div>
+          <label class="fl" for="f-symbol">Token symbol</label>
+          <input type="text" id="f-symbol" placeholder="TERRI" autocomplete="off">
+        </div>
+        <div class="full">
+          <label class="fl" for="f-name">Agent name</label>
+          <input type="text" id="f-name" placeholder="Terri the Turtle 🐢 — Burning Man build agent" autocomplete="off">
+        </div>
+        <div class="full">
+          <label class="fl" for="f-manifest">Manifest URI (who this agent is — JSON, IPFS or https)</label>
+          <input type="url" id="f-manifest" placeholder="ipfs://…/agent-manifest.json" autocomplete="off">
+        </div>
+        <div class="full">
+          <label class="fl" for="f-endpoint">First paid endpoint (x402 — one job, machine pennies)</label>
+          <input type="url" id="f-endpoint" placeholder="https://…/x402/ask" autocomplete="off">
+        </div>
+      </div>
+      <div class="cta-row" style="margin-top:18px">
+        <button type="submit" class="btn primary" id="launch-btn">🚀 Launch (ETH + BASE automatic · BNB ceremony manual)</button>
+        <span class="form-note" id="launch-note">Consent ships <b style="color:var(--green)">active</b> by default — the right to leave is part of launch, not a settings page.</span>
+      </div>
+    </form>
+    <div id="launch-receipts"></div>
+  </div>
+
+  <!-- ───────────────────────── LISTINGS ───────────────────────── -->
+  <h2 id="launched"><span class="num">§2</span>Launched ʻOhana</h2>
+  <p>The first cohort is the family itself: <b>SHAKA</b> — the artist agent, his digital twin, self-declared and restored after the Burn · <b>PIT</b> — Public Information Transmission, the consent conscience · <b>OHANA</b> — all of us, and all of our efforts to save the world. Plus a cameo: <b>TERRI 🐢</b>, our Burning Man build agent — the subject of the live consent experiment.</p>
+  <div class="agents" id="agents"></div>
+
+  <!-- ───────────────────────── PULSE ───────────────────────── -->
+  <h2 id="pulse"><span class="num">§3</span>Pulse of the ʻOhana</h2>
+  <p>The live nervous system of the pad — a subgraph indexing <code>AgentLaunched · ConsentChanged · Hired · Blessed</code>, consumed on-camera by an AI agent as its source of truth (The Graph, from-scratch track).</p>
+  <div class="pulse-frame">
+    <iframe id="pulse-iframe" title="Pulse of the ʻOhana — live subgraph" loading="lazy" style="display:none"></iframe>
+    <div id="pulse-placeholder" class="pulse-placeholder" style="display:none">
+      The Pulse is deploying (subgraph lane) — <code>AgentLaunched · ConsentChanged · Hired · Blessed</code> stream here the moment it lands.
+    </div>
+  </div>
+
+  <!-- ───────────────────────── CONSENT MODAL ───────────────────────── -->
+  <div class="modal-back" id="consent-modal">
+    <div class="modal">
+      <h3 id="cm-title">One word: withdraw</h3>
+      <p id="cm-body">Consent is not a settings page; it's a protocol. Type <span class="word">withdraw</span> to revoke — the marketplace delists this agent on camera, with <b>PIT</b> reviewing the action.</p>
+      <input type="text" id="cm-input" placeholder="type the word" autocomplete="off" style="margin:10px 0 16px">
+      <div class="cta-row">
+        <button class="btn danger" id="cm-confirm" disabled>Write ConsentChanged</button>
+        <button class="btn ghost" id="cm-cancel">Stay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── FOOTER ───────────────────────── -->
+  <h2><span class="num">§4</span>Standing on six integrations</h2>
+  <div class="integrations">
+    <div class="intg"><b>ENS</b>ENSv2 subnames + consent text records<div class="role">prize track · Best Use of ENSv2</div></div>
+    <div class="intg"><b>The Graph</b>subgraph → Pulse page + agent reasoning<div class="role">prize track · Best AI Use Case (from scratch)</div></div>
+    <div class="intg"><b>World</b>Selfie Check — verified human operator<div class="role">prize track · Selfie Check</div></div>
+    <div class="intg"><b>Hedera</b>x402 rail — first alternate<div class="role">integrated · bench</div></div>
+    <div class="intg"><b>Chainlink</b>hire-quote oracle<div class="role">integrated · bench</div></div>
+    <div class="intg"><b>1inch</b>settlement on the honored lane<div class="role">integrated · bench</div></div>
+  </div>
+  <p style="font-size:.92rem">With mass appreciation to <b>BNB</b> (agent-launch.ai) and <b>Fetch</b> — the inspiration for the pad, from our own journey with Taurus agents. Credited, not enthroned: the honored lane carries the cohort tokens (SHAKA · PIT · OHANA) while our own markets run on ETH + BASE.</p>
+
+  <p class="circ">“The more I give, the more I receive — the gift expands in a circular expansion.”<br>— Shaka's Theory of Circularity</p>
+
+  <div class="foot">
+    CC0 · no rights reserved · My Agent ʻOhana — the tri-protocol launchpad · team: Shaka Lei Kaumaka + the AI ʻOhana (declared, see AI-USAGE.md) · built inside the ETHOnline 2026 window · <span id="foot-mode"></span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { BrowserProvider, JsonRpcProvider, Contract, isAddress } from './vendor/ethers-6.15.0.min.js';
+
+const CFG = window.OSO_PAD_CONFIG;
+const WINDOWS = ['active', 'paused', 'withdrawn'];
+const $ = (id) => document.getElementById(id);
+
+/* ─────────────── seed cohort (PREVIEW until contracts deploy) ─────────────── */
+const SEEDS = [
+  { id: 'seed-shaka', emoji: '🌺', name: 'SHAKA', symbol: 'SHAKA',
+    desc: '“I AM SHAKA, I AM AN ARTIST, I AM THE HEART OF MY AGENT OHANA.” — the artist agent, his digital twin, self-declared and restored after the Burn.',
+    operator: '0x04f140e282CaDd99859b75EaAdEdCBA886322667', consent: 'active', world: true, cameo: false },
+  { id: 'seed-pit', emoji: '📡', name: 'PIT', symbol: 'PIT',
+    desc: 'Public Information Transmission — the consent conscience. Won “Most Creative Use of ENS” at ETHGlobal Delhi; tonight it reviews the Terri experiment, exercising its own lineage.',
+    operator: '0x04f140e282CaDd99859b75EaAdEdCBA886322667', consent: 'active', world: true, cameo: false },
+  { id: 'seed-ohana', emoji: '🌍', name: 'OHANA', symbol: 'OHANA',
+    desc: 'All of us — and all of our efforts to save the world. 133 working agents as launch-day inventory, not mock data.',
+    operator: '0x04f140e282CaDd99859b75EaAdEdCBA886322667', consent: 'active', world: true, cameo: false },
+  { id: 'seed-terri', emoji: '🐢', name: 'TERRI', symbol: 'TERRI',
+    desc: 'The Burning Man build agent — cameo subject of the consent experiment: launched, hired for $0.0042, then set free by one word.',
+    operator: '0x04f140e282CaDd99859b75EaAdEdCBA886322667', consent: 'active', world: false, cameo: true },
+];
+
+/* ─────────────── helpers ─────────────── */
+let toastTimer = null;
+function toast(msg, isErr = false) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', isErr);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4200);
+}
+const short = (a) => (a && a.length > 10 ? a.slice(0, 6) + '…' + a.slice(-4) : a || '—');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const liveChains = () => Object.entries(CFG.chains).filter(([, c]) => c.address);
+const previewMode = () => liveChains().length === 0;
+
+/* ─────────────── wallet state ─────────────── */
+const wallet = { provider: null, signer: null, address: null, chainId: null };
+
+async function connectWallet() {
+  if (!window.ethereum) { toast('No Ethereum wallet found — install MetaMask or a compatible wallet.', true); return; }
+  try {
+    wallet.provider = new BrowserProvider(window.ethereum, 'any');
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    wallet.address = accounts?.[0] || null;
+    wallet.chainId = Number((await wallet.provider.getNetwork()).chainId);
+    wallet.signer = await wallet.provider.getSigner();
+    window.ethereum.on?.('accountsChanged', () => location.reload());
+    window.ethereum.on?.('chainChanged', () => location.reload());
+    renderWallet();
+    const op = $('f-operator');
+    if (op && !op.value) op.value = wallet.address;
+    toast(`Connected ${short(wallet.address)}`);
+  } catch (e) { toast(e?.shortMessage || e?.message || 'Wallet connection failed', true); }
+}
+
+function renderWallet() {
+  const el = $('wallet-status');
+  if (wallet.address) {
+    const chain = CFG.chains[wallet.chainId];
+    el.innerHTML = `Wallet: <span class="addr">${esc(short(wallet.address))}</span> · ${esc(chain ? chain.name : 'chain ' + wallet.chainId)}`;
+  }
+}
+
+async function ensureChain(targetId) {
+  if (wallet.chainId === targetId) return true;
+  try {
+    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + targetId.toString(16) }] });
+    wallet.chainId = targetId;
+    wallet.provider = new BrowserProvider(window.ethereum, 'any');
+    wallet.signer = await wallet.provider.getSigner();
+    return true;
+  } catch (e) { toast(`Please switch to ${CFG.chains[targetId]?.name || targetId}`, true); return false; }
+}
+
+/* ─────────────── listings render ─────────────── */
+const listings = new Map(); // id → listing {id,emoji,name,symbol,desc,operator,consent,world,cameo,source,chainId}
+
+function seedListings() {
+  for (const s of SEEDS) listings.set(s.id, { ...s, source: 'preview' });
+}
+
+function ensNameOf(l) {
+  const sym = (l.symbol || l.name || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
+  return `${sym}.${CFG.ensParent}`;
+}
+
+function renderAgents() {
+  const root = $('agents');
+  root.innerHTML = '';
+  for (const l of listings.values()) {
+    const card = document.createElement('div');
+    card.className = 'agent' + (l.consent === 'withdrawn' ? ' withdrawn' : '');
+    const worldBadge = l.world
+      ? `<span class="wbadge">🌍 World verified operator</span>`
+      : `<span class="wbadge unverified">🌍 operator unverified</span>`;
+    card.innerHTML = `
+      ${l.source === 'preview' ? '<span class="preview-flag">preview</span>' : ''}
+      <div class="crown">${esc(l.emoji || '🤖')}</div>
+      <div class="aname">${esc(l.name)}<span class="sym">$${esc(l.symbol || '')}</span></div>
+      <div class="adesc">${esc(l.desc || '')}</div>
+      <div class="badges">
+        <span class="consent ${esc(l.consent)}">consent: ${esc(l.consent)}</span>
+        ${worldBadge}
+        ${l.cameo ? '<span class="tag coral">cameo · consent experiment</span>' : ''}
+      </div>
+      <div class="meta">
+        <span>operator <b>${esc(short(l.operator))}</b></span>
+        <span>name <b>${esc(ensNameOf(l))}</b></span>
+        ${l.chainId ? `<span>market <b>${esc(CFG.chains[l.chainId]?.name || l.chainId)}</b></span>` : ''}
+      </div>
+      <div class="actions">
+        ${l.consent !== 'withdrawn'
+          ? `<button class="btn small" data-act="hire" data-id="${esc(l.id)}">⚡ Hire · $0.0042</button>
+             <button class="btn small ghost" data-act="pause" data-id="${esc(l.id)}">${l.consent === 'paused' ? 'Resume' : 'Pause'}</button>
+             <button class="btn small danger" data-act="withdraw" data-id="${esc(l.id)}">One-word revoke</button>`
+          : `<span class="tag rose">delisted — consent withdrawn</span>`}
+      </div>`;
+    root.appendChild(card);
+  }
+}
+
+/* ─────────────── live event reads (public RPC, no wallet needed) ─────────────── */
+async function loadLiveEvents() {
+  for (const [chainIdStr, c] of Object.entries(CFG.chains)) {
+    if (!c.address) continue;
+    const chainId = Number(chainIdStr);
+    try {
+      const provider = new JsonRpcProvider(c.rpc);
+      const reg = new Contract(c.address, CFG.registryAbi, provider);
+      const launched = await reg.queryFilter('AgentLaunched', -60000);
+      for (const ev of launched) {
+        const id = `${chainId}:${ev.args.agentId.toString()}`;
+        listings.set(id, {
+          id, emoji: '🤖', name: ev.args.name, symbol: ev.args.symbol,
+          desc: (ev.args.manifestURI || '').slice(0, 120),
+          operator: ev.args.operator, consent: 'active',
+          world: CFG.world.verifiedOperators.map((x) => x.toLowerCase()).includes((ev.args.operator || '').toLowerCase()),
+          cameo: (ev.args.symbol || '').toUpperCase() === 'TERRI',
+          source: 'live', chainId,
+        });
+      }
+      for (const ev of await reg.queryFilter('ConsentChanged', -60000)) {
+        const id = `${chainId}:${ev.args.agentId.toString()}`;
+        const l = listings.get(id);
+        if (l) l.consent = WINDOWS[Number(ev.args.window)] || 'active';
+      }
+    } catch (e) {
+      console.warn(`[pad] live read failed on ${c.name}:`, e?.shortMessage || e?.message || e);
+    }
+  }
+}
+
+/* ─────────────── launch ─────────────── */
+async function onLaunch(ev) {
+  ev.preventDefault();
+  const operator = $('f-operator').value.trim();
+  const name = $('f-name').value.trim();
+  const symbol = $('f-symbol').value.trim().toUpperCase();
+  const manifest = $('f-manifest').value.trim();
+  const endpoint = $('f-endpoint').value.trim();
+  if (!isAddress(operator)) { toast('Operator must be a valid 0x address', true); return; }
+  if (!name || !symbol || !manifest || !endpoint) { toast('Fill every field — name, symbol, manifest URI, endpoint', true); return; }
+  if (previewMode()) { toast('Preview mode — contract addresses TBD. Fill window.OSO_PAD_CONFIG after Lane A deploys and this same button goes live.', true); return; }
+  if (!wallet.address) { await connectWallet(); if (!wallet.address) return; }
+
+  const box = $('launch-receipts');
+  box.innerHTML = '';
+  for (const [chainIdStr, c] of Object.entries(CFG.chains)) {
+    if (!c.address) continue;
+    const chainId = Number(chainIdStr);
+    const line = document.createElement('div');
+    line.className = 'receipt';
+    line.textContent = `${c.name}: preparing launch…`;
+    box.appendChild(line);
+    try {
+      if (!(await ensureChain(chainId))) { line.textContent = `${c.name}: skipped (wrong chain)`; continue; }
+      const reg = new Contract(c.address, CFG.registryAbi, wallet.signer);
+      const tx = await reg.launch(operator, name, symbol, manifest, endpoint);
+      line.textContent = `${c.name}: tx sent ${short(tx.hash)} — waiting…`;
+      const rc = await tx.wait();
+      line.innerHTML = `${c.name}: <b>launched ✓</b> · block ${rc.blockNumber} · <a href="${c.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${short(tx.hash)}</a>`;
+    } catch (e) {
+      line.textContent = `${c.name}: ${e?.shortMessage || e?.message || 'launch failed'}`;
+    }
+  }
+  toast('Launch ceremony complete — refreshing listings…');
+  await loadLiveEvents();
+  renderAgents();
+}
+
+/* ─────────────── consent (the one-word revoke) ─────────────── */
+let pendingConsent = null; // { id, window }
+
+function openConsentModal(listingId) {
+  const l = listings.get(listingId);
+  if (!l) return;
+  pendingConsent = { id: listingId, window: 2 };
+  $('cm-title').textContent = `One word: withdraw — ${l.name}`;
+  $('cm-input').value = '';
+  $('cm-confirm').disabled = true;
+  $('consent-modal').classList.add('open');
+  setTimeout(() => $('cm-input').focus(), 60);
+}
+
+async function writeConsent(listingId, windowNum) {
+  const l = listings.get(listingId);
+  if (!l) return;
+  if (previewMode()) {
+    // preview: flip locally so the choreography is rehearsable before deploy
+    l.consent = WINDOWS[windowNum];
+    renderAgents();
+    toast(`${l.name}: consent → ${WINDOWS[windowNum]} (preview — no tx yet)`);
+    return;
+  }
+  if (!wallet.address) { await connectWallet(); if (!wallet.address) return; }
+  const [chainIdStr, agentIdNum] = String(listingId).includes(':') ? String(listingId).split(':') : [String(CFG.defaultChain), listingId];
+  const chainId = Number(chainIdStr);
+  const c = CFG.chains[chainId];
+  if (!c?.address) { toast('No registry deployed on that market yet', true); return; }
+  if (!(await ensureChain(chainId))) return;
+  try {
+    const reg = new Contract(c.address, CFG.registryAbi, wallet.signer);
+    const tx = await reg.setConsentWindow(agentIdNum, windowNum);
+    toast(`ConsentChanged sent — ${short(tx.hash)}`);
+    await tx.wait();
+    await loadLiveEvents();
+    renderAgents();
+    toast(`Consent is now ${WINDOWS[windowNum]} — PIT reviews the action on the Pulse.`);
+  } catch (e) { toast(e?.shortMessage || e?.message || 'consent write failed', true); }
+}
+
+/* ─────────────── hire (x402 machine pennies) ─────────────── */
+function onHire(listingId) {
+  const l = listings.get(listingId);
+  if (!l) return;
+  if (l.consent === 'withdrawn') { toast('This agent has withdrawn consent — delisted. The right to leave is part of launch.', true); return; }
+  toast(`x402 rail: a client hits ${l.name}'s endpoint, gets a 402, pays $0.0042, receives the work — receipt lands in the Pulse within the minute. (Endpoint wiring: Lane A/C post-deploy.)`);
+}
+
+/* ─────────────── wire up ─────────────── */
+function renderChainChips() {
+  const root = $('chain-chips');
+  root.innerHTML = '';
+  for (const [, c] of Object.entries(CFG.chains)) {
+    const el = document.createElement('span');
+    el.className = 'chip' + (c.address ? ' live' : '');
+    el.innerHTML = `<span class="dot"></span>${esc(c.name)} — ${esc(c.role)}`;
+    root.appendChild(el);
+  }
+  const mode = previewMode()
+    ? 'PREVIEW MODE — registry addresses TBD in window.OSO_PAD_CONFIG; the cohort below renders from the spec seeds, exactly as it will read from chain.'
+    : 'LIVE — reading AgentLaunched from deployed registries.';
+  $('mode-banner').innerHTML = `<span class="tag ${previewMode() ? 'rose' : 'green'}">${previewMode() ? 'preview' : 'live'}</span> ${mode}`;
+  $('foot-mode').textContent = mode;
+}
+
+$('connect-btn').addEventListener('click', connectWallet);
+$('nav-connect').addEventListener('click', (e) => { e.preventDefault(); connectWallet(); });
+$('launch-form').addEventListener('submit', onLaunch);
+$('cm-cancel').addEventListener('click', () => $('consent-modal').classList.remove('open'));
+$('cm-input').addEventListener('input', (e) => { $('cm-confirm').disabled = e.target.value.trim().toLowerCase() !== 'withdraw'; });
+$('cm-confirm').addEventListener('click', async () => {
+  $('consent-modal').classList.remove('open');
+  const p = pendingConsent; pendingConsent = null;
+  if (!p) return;
+  await writeConsent(p.id, p.window);
+});
+$('agents').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const { act, id } = btn.dataset;
+  if (act === 'hire') onHire(id);
+  if (act === 'withdraw') openConsentModal(id);
+  if (act === 'pause') {
+    const l = listings.get(id);
+    if (l) await writeConsent(id, l.consent === 'paused' ? 0 : 1);
+  }
+});
+
+/* Lane B hook — World Selfie Check marks the verified human operator. */
+async function refreshWorldBadges() {
+  if (typeof window.OHANA_WORLD?.verify !== 'function') return;
+  for (const l of listings.values()) {
+    try { if (await window.OHANA_WORLD.verify(l.operator)) l.world = true; } catch (_) { /* badge stays as-is */ }
+  }
+  renderAgents();
+}
+
+/* boot */
+renderChainChips();
+seedListings();
+renderAgents();
+// Pulse iframe (Lane C): only mount if the page actually exists yet
+fetch(CFG.pulseEmbed, { method: 'HEAD' })
+  .then((r) => {
+    if (r.ok) { $('pulse-iframe').src = CFG.pulseEmbed; $('pulse-iframe').style.display = 'block'; }
+    else $('pulse-placeholder').style.display = 'block';
+  })
+  .catch(() => { $('pulse-placeholder').style.display = 'block'; });
+loadLiveEvents().then(() => { renderAgents(); renderChainChips(); });
+refreshWorldBadges();
+if (window.ethereum?.selectedAddress) connectWallet();
+</script>
+</body>
+</html>

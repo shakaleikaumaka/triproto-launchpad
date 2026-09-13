@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE OF THE ʻOHANA 🫀🌺 — the live nervous system of the pad</title>
+<meta name="description" content="Live launches, consent flips, hires and blessings from the AgentLaunchRegistry — indexed by The Graph. The Pulse of the ʻOhana.">
+<link rel="icon" type="image/png" href="../../assets/logo-flower.png">
+<style>
+  :root{
+    --night:#2c1f12; --deep:#f6eeda; --violet:#fbf6ea; --plum:#ecdfc0;
+    --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --gold-soft:rgba(138,90,30,.3); --coral:#b0502a; --rose:#a13a4e; --green:#3f7040;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.65;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 20px 80px}
+  a{color:var(--gold)}
+  .kicker{font-family:var(--sans);font-size:.75rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  h1{font-size:clamp(1.9rem,6vw,2.9rem);line-height:1.12;font-weight:600;margin-bottom:6px}
+  h1 em{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--cream-dim);font-style:italic;margin-bottom:18px}
+  .badge{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px;border:1px solid;vertical-align:middle;margin-left:10px}
+  .badge.live{border-color:rgba(63,112,64,.6);color:var(--green)}
+  .badge.mock{border-color:rgba(176,80,42,.7);color:var(--coral);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .mockbar{font-family:var(--sans);font-size:.85rem;background:rgba(176,80,42,.12);border:1px solid rgba(176,80,42,.45);border-radius:12px;padding:10px 16px;margin:14px 0;color:var(--coral)}
+  .mockbar b{color:var(--gold)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:22px 0}
+  .stat{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:14px 16px;text-align:center}
+  .stat .v{font-family:var(--sans);font-weight:700;font-size:1.55rem;color:var(--gold)}
+  .stat .l{font-family:var(--sans);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-faint);margin-top:2px}
+  h2{font-size:1.25rem;color:var(--gold);font-weight:600;margin:38px 0 12px;display:flex;align-items:baseline;gap:10px}
+  h2 .num{font-family:var(--sans);font-size:.72rem;color:var(--coral);letter-spacing:.12em}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .agent{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:16px 18px;position:relative}
+  .agent.delisted{opacity:.55;border-color:rgba(161,58,78,.4)}
+  .agent .nm{font-size:1.1rem;color:var(--cream);font-weight:600}
+  .agent .ens{font-family:var(--mono);font-size:.78rem;color:var(--gold);margin-top:2px;word-break:break-all}
+  .agent .ep{font-family:var(--mono);font-size:.72rem;color:var(--cream-faint);margin-top:2px;word-break:break-all}
+  .agent .meta{font-family:var(--sans);font-size:.75rem;color:var(--cream-dim);margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-block;font-family:var(--sans);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid}
+  .chip.active{border-color:rgba(63,112,64,.5);color:var(--green)}
+  .chip.paused{border-color:rgba(138,90,30,.55);color:var(--gold)}
+  .chip.withdrawn{border-color:rgba(161,58,78,.5);color:var(--rose)}
+  .chip.unknown{border-color:rgba(59,44,30,.32);color:var(--cream-faint)}
+  .chip.delisted{border-color:rgba(161,58,78,.7);color:var(--rose);background:rgba(161,58,78,.12)}
+  .chip.ens{border-color:rgba(138,90,30,.55);color:var(--gold)}
+  .feed{display:flex;flex-direction:column;gap:8px}
+  .ev{display:flex;gap:12px;align-items:flex-start;background:rgba(251,246,234,.78);border:1px solid rgba(138,90,30,.2);border-radius:12px;padding:10px 14px}
+  .ev .ic{font-size:1.05rem;flex-shrink:0;margin-top:1px}
+  .ev .tx{font-size:.95rem;color:var(--cream-dim);word-break:break-word}
+  .ev .tx b{color:var(--cream)}
+  .ev .tm{font-family:var(--sans);font-size:.72rem;color:var(--cream-faint);white-space:nowrap;margin-left:auto;flex-shrink:0}
+  .foot{margin-top:52px;padding-top:18px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
+  .foot code{font-family:var(--mono);font-size:.72rem;word-break:break-all}
+  .circ{font-style:italic;color:var(--cream-dim);text-align:center;margin:30px auto 0;max-width:620px;font-size:.98rem}
+  .err{background:rgba(161,58,78,.1);border:1px solid rgba(161,58,78,.4);border-radius:12px;padding:10px 16px;font-family:var(--sans);font-size:.82rem;color:var(--rose);margin:12px 0}
+  /* ── ancient-page skin: kapa (tapa) pattern strips ── */
+  .wrap::before,.foot::before{content:"";display:block;height:10px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8}
+  .wrap::before{margin:-16px 0 24px}
+  .foot::before{margin:-18px 0 18px;height:8px}
+  .agent{overflow:hidden}
+  .agent::before{content:"";display:block;height:7px;margin:-16px -18px 12px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+</style>
+</head>
+<body>
+<span class="tatau-panel left" aria-hidden="true"></span>
+<span class="tatau-panel right" aria-hidden="true"></span>
+<div class="wrap">
+
+  <div class="kicker">My Agent ʻOhana · ETHOnline 2026 · The Graph lane</div>
+  <h1>PULSE OF THE ʻOHANA <em>— the live nervous system of the pad</em><span id="mode-badge" class="badge mock">…</span></h1>
+  <p class="lede">Every launch, every consent flip, every hire — indexed by The Graph from the <code>AgentLaunchRegistry</code>, rendered the moment the block lands.</p>
+
+  <div id="mockbar" class="mockbar" hidden>
+    🟡 <b>MOCK DATA</b> — no live subgraph endpoint configured (or query failed). This fallback exists for pre-deploy development only; The Graph prize requires <b>live data from a Graph provider</b>. Set <code>?endpoint=</code> or <code>SUBGRAPH_ENDPOINT</code> to go live. Deploy steps: <code>subgraph/README.md</code>.
+  </div>
+  <div id="errbar" class="err" hidden></div>
+
+  <div class="stats" id="stats"></div>
+
+  <h2><span class="num">AGENTS</span>The cohort on the pad</h2>
+  <div class="grid" id="agents"></div>
+
+  <h2><span class="num">FEED</span>Launches · consent flips · hires · blessings · comings &amp; goings</h2>
+  <div class="feed" id="feed"></div>
+
+  <p class="circ">“Consent is not a settings page; it's a protocol — and the right to leave is part of launch.”</p>
+
+  <div class="foot">
+    <div>source: <code id="src">—</code> · refreshes every 15s · built by Lane C (graph) of the AI ʻOhana · CC0</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ═══ Pulse of the ʻOhana — vendored fetch, no build step ═══
+   Schema synced to AgentLaunchRegistry.sol event spine canon (contracts/README @ lane/contracts).
+   Endpoint resolution order:
+   1. ?endpoint=<url>  (comma-separated for multi-chain merge)
+   2. localStorage["pulse.endpoint"]
+   3. SUBGRAPH_ENDPOINT const below
+   If none resolves or every query fails → clearly-flagged MOCK mode. */
+const SUBGRAPH_ENDPOINT = "https://api.studio.thegraph.com/query/1760239/my-agent-ohana/v0.0.1"; // LIVE — Studio deploy (The Graph prize: live data from a Graph provider)
+const SUBGRAPH_API_KEY = "ab23adecd20fb599f7cc4953375c69a7"; // public query key (client-safe, rate-limited to the pad)
+
+const FAMILY_NAME = "agentohana.eth"; // display suffix for labels (ensName = label.family; canon per contracts/README)
+const ZERO32 = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+const QUERY = `query Pulse {
+  pulseStats(id: "pulse") { totalAgents totalRegistered totalHires totalConsentChanges totalBlessings totalDelists totalRelists totalHiredAmount lastEventAt }
+  agents(first: 50, orderBy: launchedAt, orderDirection: desc) {
+    id agentId label operator manifestURI serviceEndpoint consentStatus listed blessed blessCount hireCount totalHiredAmount ensNode expiry registeredOnly launchedAt
+  }
+  launchEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } operator label serviceEndpoint timestamp txHash }
+  consentEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } oldStatus newStatus changedBy timestamp txHash }
+  hireEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } client amount rail receiptRef timestamp txHash }
+  blessEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } verifier proofRef timestamp txHash }
+  delistEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } delistedBy reason timestamp txHash }
+  relistEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } relistedBy timestamp txHash }
+  subnameEvents(first: 25, orderBy: timestamp, orderDirection: desc) { id agent { label } label node timestamp txHash }
+}`;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const short = (a) => a ? String(a).slice(0,6) + "…" + String(a).slice(-4) : "";
+const ago = (ts) => {
+  const s = Math.max(0, Math.floor(Date.now()/1000) - Number(ts));
+  if (s < 60) return s + "s ago";
+  if (s < 3600) return Math.floor(s/60) + "m ago";
+  if (s < 86400) return Math.floor(s/3600) + "h ago";
+  return Math.floor(s/86400) + "d ago";
+};
+/* x402 machine pennies: amounts are posted by rails in their asset's base units;
+   the demo rail is 6-decimal USDC ($0.0042 = 4200) */
+const pennies = (raw) => {
+  try {
+    const v = Number(raw) / 1e6;
+    if (!isFinite(v)) return String(raw);
+    return "$" + v.toFixed(4).replace(/0+$/,"").replace(/\.$/,"");
+  } catch { return String(raw); }
+};
+const ensOf = (label) => label ? `${label}.${FAMILY_NAME}` : "";
+
+function resolveEndpoints() {
+  const url = new URL(location.href);
+  const q = url.searchParams.get("endpoint");
+  if (q) { try { localStorage.setItem("pulse.endpoint", q); } catch {} return q.split(",").map(s=>s.trim()).filter(Boolean); }
+  let ls = "";
+  try { ls = localStorage.getItem("pulse.endpoint") || ""; } catch {}
+  const raw = ls || SUBGRAPH_ENDPOINT;
+  return raw.split(",").map(s=>s.trim()).filter(Boolean);
+}
+
+async function queryOne(endpoint) {
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${SUBGRAPH_API_KEY || (localStorage.getItem("pulse_apikey")||"")}` },
+    body: JSON.stringify({ query: QUERY })
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const json = await res.json();
+  if (json.errors) throw new Error(json.errors.map(e=>e.message).join("; "));
+  return json.data;
+}
+
+function mergeData(datas) {
+  const out = { pulseStats: null, agents: [], _feeds: { launch:[], consent:[], hire:[], bless:[], delist:[], relist:[], subname:[] } };
+  for (const d of datas) {
+    if (d.pulseStats) out.pulseStats = d.pulseStats;
+    out.agents.push(...(d.agents||[]));
+    out._feeds.launch.push(...(d.launchEvents||[]).map(e=>({...e,kind:"launch"})));
+    out._feeds.consent.push(...(d.consentEvents||[]).map(e=>({...e,kind:"consent"})));
+    out._feeds.hire.push(...(d.hireEvents||[]).map(e=>({...e,kind:"hire"})));
+    out._feeds.bless.push(...(d.blessEvents||[]).map(e=>({...e,kind:"bless"})));
+    out._feeds.delist.push(...(d.delistEvents||[]).map(e=>({...e,kind:"delist"})));
+    out._feeds.relist.push(...(d.relistEvents||[]).map(e=>({...e,kind:"relist"})));
+    out._feeds.subname.push(...(d.subnameEvents||[]).map(e=>({...e,kind:"subname"})));
+  }
+  return out;
+}
+
+/* ── MOCK fallback (pre-deploy development only — NOT prize-eligible) ── */
+function mockData() {
+  const now = Math.floor(Date.now()/1000);
+  const op = "0x04f140e282CaDd99859b75EaAdEdCBA886322667";
+  const tx = "0x" + "ab".repeat(32);
+  const A = (id,label,status,listed,blessed,hires,ts) => ({
+    id:String(id), agentId:String(id), label, operator:op, manifestURI:"ipfs://manifest/"+label,
+    serviceEndpoint:"x402://"+label+"/job", consentStatus:status, listed, blessed,
+    blessCount:blessed?1:0, hireCount:hires, totalHiredAmount:String(hires*4200),
+    ensNode:ZERO32, ensTokenId:"0", expiry:"0", registeredOnly:false, launchedAt:String(ts)
+  });
+  const agents = [
+    A(1,"shaka","active",true,true,0,now-3600),
+    A(2,"pit","active",true,true,0,now-3500),
+    A(3,"ohana","active",true,false,0,now-3400),
+    A(4,"terri","withdrawn",false,true,1,now-3300),
+  ];
+  return {
+    pulseStats: { totalAgents:4, totalRegistered:4, totalHires:1, totalConsentChanges:1, totalBlessings:3, totalDelists:1, totalRelists:0, totalHiredAmount:"4200", lastEventAt:String(now-600) },
+    agents,
+    _feeds: {
+      launch: agents.map(a=>({kind:"launch", id:"m"+a.id, agent:{label:a.label}, operator:op, label:a.label, serviceEndpoint:a.serviceEndpoint, timestamp:a.launchedAt, txHash:tx})),
+      consent: [{kind:"consent", id:"mc1", agent:{label:"terri"}, oldStatus:"active", newStatus:"withdrawn", changedBy:op, timestamp:String(now-600), txHash:tx}],
+      hire: [{kind:"hire", id:"mh1", agent:{label:"terri"}, client:op, amount:"4200", rail:"x402-base-sepolia", receiptRef:"receipt:0.0042-usdc", timestamp:String(now-1200), txHash:tx}],
+      bless: agents.filter(a=>a.blessed).map(a=>({kind:"bless", id:"mb"+a.id, agent:{label:a.label}, verifier:"world", proofRef:"selfie-check", timestamp:String(Number(a.launchedAt)+60), txHash:tx})),
+      delist: [{kind:"delist", id:"md1", agent:{label:"terri"}, delistedBy:op, reason:"consent withdrawn", timestamp:String(now-590), txHash:tx}],
+      relist: [],
+      subname: agents.map(a=>({kind:"subname", id:"ms"+a.id, agent:{label:a.label}, label:a.label, node:"0x"+"cd".repeat(32), timestamp:String(Number(a.launchedAt)+30), txHash:tx})),
+    }
+  };
+}
+
+const ICONS = { launch:"🚀", consent:"🪟", hire:"🪙", bless:"🌺", delist:"🚪", relist:"💚", subname:"⚓" };
+
+function renderStats(s) {
+  const cells = [
+    [s?.totalAgents ?? 0, "agents launched"],
+    [s?.totalHires ?? 0, "hires"],
+    [s?.totalConsentChanges ?? 0, "consent flips"],
+    [s?.totalBlessings ?? 0, "blessings"],
+    [(s?.totalDelists ?? 0) + " / " + (s?.totalRelists ?? 0), "delists / relists"],
+    [s && s.totalHiredAmount ? pennies(s.totalHiredAmount) : "$0", "machine pennies"],
+  ];
+  $("stats").innerHTML = cells.map(([v,l]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
+}
+
+function renderAgents(agents) {
+  if (!agents.length) { $("agents").innerHTML = `<div class="ev"><span class="tx">no agents indexed yet — the pad awaits its first launch 🌱</span></div>`; return; }
+  $("agents").innerHTML = agents.map(a => {
+    const ensAnchored = a.ensNode && a.ensNode !== ZERO32;
+    return `
+    <div class="agent ${a.listed === false ? "delisted" : ""}">
+      <div class="nm">${esc(a.label || "agent #" + a.agentId)} ${a.blessed ? "🌺" : ""}</div>
+      <div class="ens">${esc(ensOf(a.label))}${ensAnchored ? " ⚓" : ""}</div>
+      <div class="ep">${esc(a.serviceEndpoint || "")}</div>
+      <div class="meta">
+        <span class="chip ${esc(a.consentStatus)}">${esc(a.consentStatus)}</span>
+        ${a.listed === false ? '<span class="chip delisted">delisted</span>' : ""}
+        ${ensAnchored ? '<span class="chip ens">ens anchored</span>' : ""}
+        <span class="chip">${esc(a.hireCount)} hire${a.hireCount==1?"":"s"}</span>
+        <span class="chip">${pennies(a.totalHiredAmount)}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderFeed(feeds) {
+  const all = [...feeds.launch, ...feeds.consent, ...feeds.hire, ...feeds.bless, ...feeds.delist, ...feeds.relist, ...feeds.subname]
+    .sort((a,b) => Number(b.timestamp) - Number(a.timestamp)).slice(0, 50);
+  if (!all.length) { $("feed").innerHTML = `<div class="ev"><span class="tx">quiet on the pad — the pulse waits for the first block 🫀</span></div>`; return; }
+  $("feed").innerHTML = all.map(e => {
+    const nm = e.agent?.label || e.label || "?";
+    let body = "";
+    if (e.kind === "launch") body = `<b>${esc(ensOf(e.label))}</b> launched by ${short(e.operator)} · endpoint ${esc(e.serviceEndpoint)}`;
+    if (e.kind === "consent") body = `<b>${esc(ensOf(nm))}</b> consent: ${esc(e.oldStatus)} → <b>${esc(e.newStatus)}</b> by ${short(e.changedBy)}`;
+    if (e.kind === "hire") body = `<b>${esc(ensOf(nm))}</b> hired for <b>${pennies(e.amount)}</b> by ${short(e.client)} · ${esc(e.rail)} · ${esc(e.receiptRef)}`;
+    if (e.kind === "bless") body = `<b>${esc(ensOf(nm))}</b> blessed — verifier ${esc(e.verifier)} 🌺`;
+    if (e.kind === "delist") body = `<b>${esc(ensOf(nm))}</b> delisted — ${esc(e.reason)} (by ${short(e.delistedBy)})`;
+    if (e.kind === "relist") body = `<b>${esc(ensOf(nm))}</b> relisted by ${short(e.relistedBy)} — welcome back 💚`;
+    if (e.kind === "subname") body = `<b>${esc(ensOf(e.label))}</b> anchored on ENSv2 ⚓ node ${short(e.node)}`;
+    return `<div class="ev"><span class="ic">${ICONS[e.kind]}</span><span class="tx">${body}</span><span class="tm">${ago(e.timestamp)}</span></div>`;
+  }).join("");
+}
+
+async function refresh() {
+  const endpoints = resolveEndpoints();
+  $("src").textContent = endpoints.length ? endpoints.join(" , ") : "(no endpoint — mock mode)";
+  if (!endpoints.length) return setMode(true, null);
+  try {
+    const results = await Promise.allSettled(endpoints.map(queryOne));
+    const ok = results.filter(r => r.status === "fulfilled").map(r => r.value);
+    if (!ok.length) {
+      const why = results.map(r => r.reason?.message || "?").join(" · ");
+      return setMode(true, why);
+    }
+    setMode(false, null);
+    paint(mergeData(ok));
+  } catch (e) { setMode(true, e.message); }
+}
+
+function setMode(mock, err) {
+  const b = $("mode-badge");
+  b.className = "badge " + (mock ? "mock" : "live");
+  b.textContent = mock ? "🟡 mock" : "🟢 live";
+  $("mockbar").hidden = !mock;
+  const eb = $("errbar");
+  if (err) { eb.hidden = false; eb.textContent = "endpoint error: " + err + " — showing mock fallback"; }
+  else eb.hidden = true;
+  if (mock) paint(mockData());
+}
+
+function paint(data) {
+  renderStats(data.pulseStats);
+  renderAgents(data.agents || []);
+  renderFeed(data._feeds || { launch:[], consent:[], hire:[], bless:[], delist:[], relist:[], subname:[] });
+}
+
+refresh();
+setInterval(refresh, 15000);
+</script>
+</body>
+</html>
