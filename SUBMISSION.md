@@ -67,3 +67,8 @@ Draft form answers, ready to paste into the Hacker Dashboard. Fields marked **TB
 - [ ] The one-word revoke captured on camera, PIT review visible
 - [ ] Video uploaded, link pasted above
 - [ ] Submitted from Shaka's Hacker Dashboard before **Sun Sep 13 · 12:00pm EDT (10:00 AM Denver)**
+
+## LIVE LINKS (2026-09-13)
+- Registry (Sepolia): https://sepolia.etherscan.io/address/0x62412fcA6437b914EDD87b85455682Ec73968347
+- Subgraph (Studio): https://thegraph.com/studio/subgraph/my-agent-ohana
+- Pulse (live data): served at pad /pulse/ — reads the Studio endpoint with 🟢 live badge
