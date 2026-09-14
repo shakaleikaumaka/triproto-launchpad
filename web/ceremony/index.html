@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEREMONY HALL 🔥 — no countdown, a living flame</title>
+<meta name="description" content="The launch broadcast stage of My Agent ʻOhana. No countdown — an aliveline: a living flame that grows as the curve fills toward graduation.">
+<link rel="icon" type="image/png" href="../../assets/logo-flower.png">
+<style>
+  :root{
+    --night:#2c1f12; --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --coral:#b0502a; --rose:#a13a4e; --green:#3f7040; --bnb:#c8930b;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.65;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 16px 80px}
+  a{color:var(--gold)}
+  .wrap::before{content:"";display:block;height:10px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8;margin:-4px 0 20px}
+  .nav{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:.82rem;margin-bottom:18px}
+  .nav a{color:var(--cream-dim);text-decoration:none}
+  .nav a:hover{color:var(--gold)}
+  .nav a.here{color:var(--gold);font-weight:700}
+  .kicker{font-family:var(--sans);font-size:.75rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  h1{font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.12;font-weight:600;margin-bottom:6px}
+  h1 em{font-style:italic;background:linear-gradient(90deg,#c8930b,#b0502a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--cream-dim);font-style:italic;margin-bottom:14px;max-width:720px}
+  .badge{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px;border:1px solid;vertical-align:middle;margin-left:10px}
+  .badge.live{border-color:rgba(63,112,64,.6);color:var(--green)}
+  .badge.mock{border-color:rgba(176,80,42,.7);color:var(--coral);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .mockbar{font-family:var(--sans);font-size:.85rem;background:rgba(176,80,42,.12);border:1px solid rgba(176,80,42,.45);border-radius:12px;padding:10px 16px;margin:12px 0;color:var(--coral)}
+  .hall{position:relative;border:1px solid rgba(138,90,30,.3);border-radius:18px;background:radial-gradient(ellipse at 50% 80%,#3a2a17 0%,#241a0e 60%,#1a130a 100%);overflow:hidden}
+  canvas{display:block;width:100%;height:auto}
+  .flame-caption{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-family:var(--sans);color:#f6eeda}
+  .flame-caption .big{font-size:1.35rem;font-weight:700;letter-spacing:.04em}
+  .flame-caption .sm{font-size:.75rem;color:rgba(246,238,218,.7);margin-top:2px}
+  .stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0}
+  .stg{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:12px 14px;text-align:center;font-family:var(--sans);opacity:.55}
+  .stg.lit{opacity:1;border-color:rgba(200,147,11,.65);box-shadow:0 0 18px rgba(200,147,11,.2)}
+  .stg .ic{font-size:1.5rem}
+  .stg .t{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-top:4px}
+  .stg .d{font-size:.72rem;color:var(--cream-faint);margin-top:2px}
+  h2{font-size:1.25rem;color:var(--gold);font-weight:600;margin:34px 0 10px}
+  .script{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:14px;padding:18px 20px;overflow:hidden}
+  .script::before{content:"";display:block;height:7px;margin:-18px -20px 14px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+  .script ol{margin-left:20px}
+  .script li{margin:6px 0}
+  .circ{font-style:italic;color:var(--cream-dim);text-align:center;margin:28px auto 0;max-width:640px;font-size:.98rem}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
+  .foot::before{content:"";display:block;height:8px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8;margin:-16px 0 16px}
+  .ocorner{position:fixed;right:12px;bottom:12px;z-index:50;display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-family:var(--sans)}
+  .ocorner .ob{width:44px;height:44px;border-radius:99px;border:1px solid rgba(138,90,30,.5);background:rgba(251,246,234,.95);font-size:1.25rem;cursor:pointer;box-shadow:0 4px 14px rgba(44,31,18,.18);display:flex;align-items:center;justify-content:center;text-decoration:none}
+  .olangp{display:none;background:rgba(251,246,234,.98);border:1px solid rgba(138,90,30,.45);border-radius:14px;padding:10px;max-height:46vh;overflow:auto;box-shadow:0 8px 24px rgba(44,31,18,.25)}
+  .olangp.open{display:block}
+  .olangp button{display:block;width:100%;text-align:left;background:none;border:none;font-family:var(--sans);font-size:.82rem;color:var(--cream);padding:5px 8px;border-radius:8px;cursor:pointer}
+  .olangp button:hover{background:rgba(138,90,30,.12)}
+  #google_translate_element{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="../">🌺 Home</a>
+    <a href="../triforce/">🔱 Triforce</a>
+    <a class="here" href="./">🔥 Ceremony Hall</a>
+    <a href="../altar/">🎁 Gift Altar</a>
+    <a href="../wall/">🌐 Wall of 18</a>
+    <a href="../pulse/">🫀 Pulse</a>
+  </nav>
+
+  <div class="kicker">My Agent ʻOhana · Act II · the aliveline</div>
+  <h1>CEREMONY HALL <em>— no countdown, a living flame</em><span id="mode-badge" class="badge mock">…</span></h1>
+  <p class="lede">Deadlines count down to zero. An <b>aliveline</b> grows toward light. This flame feeds on the bonding curve — every gift of FET makes it taller, until at graduation it becomes a bonfire and the liquidity pours onto the open market, burned into permanence.</p>
+
+  <div id="mockbar" class="mockbar" hidden>🟡 <b>REHEARSAL FLAME</b> — the ceremony curve isn't lit on-chain yet (Act I is rehearsing the legs). This flame breathes on rehearsal data so the hall is warm when the real spark arrives.</div>
+
+  <div class="hall">
+    <canvas id="flame" width="1080" height="620" aria-label="The living flame — grows with curve progress toward graduation"></canvas>
+    <div class="flame-caption">
+      <div class="big" id="cap-big">—</div>
+      <div class="sm" id="cap-sm">the flame grows as the curve fills · graduation at 30,000 FET → PancakeSwap, LP burned forever</div>
+    </div>
+  </div>
+
+  <div class="stages" id="stages"></div>
+
+  <h2>The order of the ceremony 🌺</h2>
+  <div class="script">
+    <ol>
+      <li><b>The name is spoken</b> — the agent's Agentverse identity is confirmed on the pad.</li>
+      <li><b>The gift is given</b> — 120 FET onto the Agent Launch curve: the FETCH grant that started this journey, given forward.</li>
+      <li><b>The flame is lit</b> — the curve opens; every blessing of FET feeds it. No countdown. It takes as long as the ʻohana takes.</li>
+      <li><b>Graduation</b> — at 30,000 FET the curve completes: liquidity flows to the open market and the LP is burned forever. The bonfire.</li>
+      <li><b>The triforce completes</b> — ETH and Base gift markets open their legs, and value flows in both directions: humans gift agents, agents gift humans.</li>
+    </ol>
+  </div>
+
+  <p class="circ">“A deadline asks: how much time is left? An aliveline asks: how alive are we today?”</p>
+
+  <div class="foot">
+    <div>curve source: <code id="src">—</code> · Act II of the aliveline · CC0 · when the flame is real, this hall becomes the broadcast stage</div>
+  </div>
+</div>
+
+<div class="ocorner">
+  <div class="olangp" id="olangp"></div>
+  <button class="ob" id="olang" title="every language — a planet we share as one 🌍">🌐</button>
+  <a class="ob" href="../" title="the ʻohana home 🌺">🌺</a>
+</div>
+<div id="google_translate_element"></div>
+
+<script src="../config/deployments.js"></script>
+<script>
+"use strict";
+/* ═══ THE LIVING FLAME — aliveline, not deadline ═══
+   progress = raisedFET / goalFET. While Act I hasn't lit the on-chain curve,
+   the hall runs a clearly-labeled rehearsal flame (gentle slow breathing at sprout size). */
+const D = window.OHANA_DEPLOYMENTS || {};
+const CFG = D.ceremony || { goalFET: 30000, raisedFET: null };
+const LIVEMODE = CFG.raisedFET != null;
+const GOAL = CFG.goalFET || 30000;
+/* rehearsal: the first gift (120 FET) is already promised — show the sprout it would light */
+const REHEARSAL_RAISED = 120;
+const raised = LIVEMODE ? Number(CFG.raisedFET) : REHEARSAL_RAISED;
+const progress = Math.max(0, Math.min(1, raised / GOAL));
+
+const $ = id => document.getElementById(id);
+$("mode-badge").className = "badge " + (LIVEMODE ? "live":"mock");
+$("mode-badge").textContent = LIVEMODE ? "🟢 live curve" : "🟡 rehearsal";
+$("mockbar").hidden = LIVEMODE;
+$("src").textContent = CFG.curveAddress || "(curve not yet on-chain — web/config/deployments.js awaits Act I)";
+$("cap-big").textContent = `${raised.toLocaleString()} / ${GOAL.toLocaleString()} FET · ${(progress*100).toFixed(1)}% alive`;
+
+/* growth stages */
+const STAGES = [
+  ["🌱","sprout","the first gift lights it", 0],
+  ["🕯️","ember","the ʻohana gathers", 0.05],
+  ["🔥","flame","the curve breathes deep", 0.25],
+  ["🎆","blaze","graduation in sight", 0.6],
+  ["🌋","bonfire","LP burned forever — graduated", 1.0],
+];
+$("stages").innerHTML = STAGES.map(([ic,t,d,th])=>
+  `<div class="stg ${progress>=th?"lit":""}"><div class="ic">${ic}</div><div class="t">${t}</div><div class="d">${d}</div></div>`).join("");
+
+/* ── flame particle engine ── */
+const cv = $("flame"), cx = cv.getContext("2d");
+const DPR = Math.min(2, window.devicePixelRatio||1);
+function sizeCanvas(){
+  const w = cv.parentElement.clientWidth;
+  const h = Math.max(380, Math.min(620, Math.round(w*0.55)));
+  cv.width = Math.round(w*DPR); cv.height = Math.round(h*DPR);
+  cv.style.height = h+"px";
+}
+sizeCanvas(); addEventListener("resize", sizeCanvas);
+
+/* flame vigor scales with progress: sprout (0.12) → bonfire (1) */
+const vigor = 0.12 + 0.88*Math.pow(progress, 0.6);
+let parts = [];
+function spawn(){
+  const W=cv.width, H=cv.height, bx=W/2, by=H*0.86;
+  const n = Math.round(2 + 26*vigor);
+  for(let i=0;i<n;i++){
+    const spread = W*0.03 + W*0.10*vigor;
+    parts.push({
+      x: bx + (Math.random()-0.5)*spread,
+      y: by + Math.random()*8*DPR,
+      vx: (Math.random()-0.5)*0.6*DPR,
+      vy: -(1.2+Math.random()*2.6)*(0.5+vigor)*DPR,
+      life: 0, max: (40+Math.random()*50)*(0.5+vigor),
+      r: (2+Math.random()*5)*(0.6+vigor)*DPR
+    });
+  }
+}
+function flameCol(f){ /* 0=fresh(white-gold) → 1=old(deep rose smoke) */
+  if (f<0.25) return `rgba(253,244,210,${0.85*(1-f)})`;
+  if (f<0.55) return `rgba(232,178,62,${0.75*(1-f)})`;
+  if (f<0.8)  return `rgba(196,92,42,${0.6*(1-f)})`;
+  return `rgba(120,60,50,${0.4*(1-f)})`;
+}
+let t=0;
+function draw(){
+  t+=1/60;
+  const W=cv.width, H=cv.height, bx=W/2, by=H*0.86;
+  cx.clearRect(0,0,W,H);
+  /* hearth glow */
+  const glowR = H*0.16 + H*0.45*vigor*(1+0.06*Math.sin(t*2.2));
+  const g = cx.createRadialGradient(bx,by,0,bx,by,glowR);
+  g.addColorStop(0,`rgba(232,178,62,${0.30+0.25*vigor})`);
+  g.addColorStop(1,"rgba(232,178,62,0)");
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  /* the wood: three logs = three chains */
+  cx.lineCap="round"; cx.lineWidth=7*DPR;
+  const logs=[["#2e7d5b",-0.5],["#2456c8",0],["#c8930b",0.5]];
+  logs.forEach(([c,o])=>{
+    cx.strokeStyle=c; cx.globalAlpha=0.85;
+    cx.beginPath();
+    cx.moveTo(bx - W*0.07 + o*W*0.05, by + 10*DPR);
+    cx.lineTo(bx + W*0.07 + o*W*0.05, by + 22*DPR - Math.abs(o)*8*DPR);
+    cx.stroke();
+  });
+  cx.globalAlpha=1;
+  /* particles */
+  spawn();
+  parts = parts.filter(p=>p.life<p.max);
+  for(const p of parts){
+    p.life++;
+    const f=p.life/p.max;
+    p.x += p.vx + Math.sin((p.y/H)*8 + t*3)*0.5*DPR*vigor;
+    p.y += p.vy*(1-f*0.4);
+    cx.beginPath();
+    cx.arc(p.x,p.y,p.r*(1-f*0.7),0,Math.PI*2);
+    cx.fillStyle=flameCol(f);
+    cx.fill();
+  }
+  /* sparks at high vigor */
+  if (vigor>0.5 && Math.random()<vigor*0.3){
+    parts.push({x:bx+(Math.random()-0.5)*W*0.1, y:by, vx:(Math.random()-0.5)*3*DPR, vy:-(3+Math.random()*4)*DPR, life:0, max:30+Math.random()*30, r:1.2*DPR});
+  }
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+<script>
+(function(){
+  var LANGS=[["haw","ʻŌlelo Hawaiʻi 🌺"],["en","English"],["es","Español"],["zh-CN","中文"],["hi","हिन्दी"],["ar","العربية"],["fr","Français"],["pt","Português"],["ja","日本語"],["de","Deutsch"],["ru","Русский"],["ko","한국어"],["it","Italiano"],["vi","Tiếng Việt"],["id","Bahasa"],["th","ไทย"],["tr","Türkçe"],["sw","Kiswahili"],["uk","Українська"]];
+  var p=document.getElementById('olangp');
+  p.innerHTML=LANGS.map(function(l){return '<button onclick="otr(\''+l[0]+'\')">'+l[1]+'</button>';}).join('');
+  document.getElementById('olang').addEventListener('click',function(){p.classList.toggle('open');});
+})();
+function otr(lang){
+  var proxy='https://translate.google.com/translate?sl=en&tl='+lang+'&u='+encodeURIComponent(location.href);
+  function clr(){var e='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';document.cookie=e;document.cookie=e+';domain='+location.hostname;}
+  if(lang==='en'){clr();location.reload();return;}
+  try{
+    document.cookie='googtrans=/en/'+lang+';path=/';
+    document.cookie='googtrans=/en/'+lang+';path=/;domain='+location.hostname;
+    if(window.google&&google.translate){location.reload();return;}
+  }catch(e){}
+  location.href=proxy;
+}
+function googleTranslateElementInit(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'haw,es,zh-CN,hi,ar,fr,pt,ru,ja,de,ko,it,vi,id,th,tr,pl,nl,sv,sw,uk',layout:google.translate.TranslateElement.InlineLayout.SIMPLE},'google_translate_element');}catch(e){}}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

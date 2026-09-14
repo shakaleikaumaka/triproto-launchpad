@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE TRIFORCE 🔱 — three chains, one ʻohana</title>
+<meta name="description" content="Three living triangles — ETH emerald · Base blue · BNB gold — breathing with live chain data. Agents orbit as glowing nodes. My Agent ʻOhana.">
+<link rel="icon" type="image/png" href="../../assets/logo-flower.png">
+<style>
+  :root{
+    --night:#2c1f12; --deep:#f6eeda; --violet:#fbf6ea; --plum:#ecdfc0;
+    --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --gold-soft:rgba(138,90,30,.3); --coral:#b0502a; --rose:#a13a4e; --green:#3f7040;
+    --eth:#2e7d5b; --base:#2456c8; --bnb:#c8930b;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.65;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 16px 80px}
+  a{color:var(--gold)}
+  .wrap::before{content:"";display:block;height:10px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8;margin:-4px 0 20px}
+  .nav{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:.82rem;margin-bottom:18px;align-items:center}
+  .nav a{color:var(--cream-dim);text-decoration:none}
+  .nav a:hover{color:var(--gold)}
+  .nav a.here{color:var(--gold);font-weight:700}
+  .kicker{font-family:var(--sans);font-size:.75rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  h1{font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.12;font-weight:600;margin-bottom:6px}
+  h1 em{font-style:italic;background:linear-gradient(90deg,var(--eth),var(--base) 50%,var(--bnb));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--cream-dim);font-style:italic;margin-bottom:14px}
+  .badge{display:inline-block;font-family:var(--sans);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;border-radius:99px;border:1px solid;vertical-align:middle;margin-left:10px}
+  .badge.live{border-color:rgba(63,112,64,.6);color:var(--green)}
+  .badge.mock{border-color:rgba(176,80,42,.7);color:var(--coral);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .mockbar{font-family:var(--sans);font-size:.85rem;background:rgba(176,80,42,.12);border:1px solid rgba(176,80,42,.45);border-radius:12px;padding:10px 16px;margin:12px 0;color:var(--coral)}
+  .stage{position:relative;border:1px solid rgba(138,90,30,.3);border-radius:18px;background:radial-gradient(ellipse at 50% 42%,#fdf8ec 0%,#f2e8cf 70%,#eadfc0 100%);overflow:hidden;box-shadow:inset 0 0 60px rgba(138,90,30,.08)}
+  canvas{display:block;width:100%;height:auto;touch-action:manipulation;cursor:pointer}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:.75rem;color:var(--cream-dim);margin:10px 2px}
+  .legend b{font-weight:700}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:99px;vertical-align:-1px;margin-right:5px}
+  /* agent card */
+  .card{position:absolute;bottom:14px;left:50%;transform:translate(-50%,12px);opacity:0;pointer-events:none;transition:.25s;width:min(340px,92%);background:rgba(251,246,234,.97);border:1px solid rgba(138,90,30,.4);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(44,31,18,.25);overflow:hidden}
+  .card.open{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+  .card::before{content:"";display:block;height:7px;margin:-14px -16px 10px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+  .card .nm{font-size:1.15rem;font-weight:600}
+  .card .ens{font-family:var(--mono);font-size:.78rem;color:var(--gold);word-break:break-all;margin-top:2px}
+  .card .meta{font-family:var(--sans);font-size:.75rem;color:var(--cream-dim);margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-block;font-family:var(--sans);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 9px;border-radius:99px;border:1px solid}
+  .chip.active{border-color:rgba(63,112,64,.5);color:var(--green)}
+  .chip.paused{border-color:rgba(138,90,30,.55);color:var(--gold)}
+  .chip.withdrawn{border-color:rgba(161,58,78,.5);color:var(--rose)}
+  .chip.unknown{border-color:rgba(59,44,30,.32);color:var(--cream-faint)}
+  .card .acts{display:flex;gap:8px;margin-top:12px}
+  .btn{flex:1;font-family:var(--sans);font-size:.8rem;font-weight:700;text-align:center;padding:8px 10px;border-radius:10px;border:1px solid rgba(138,90,30,.5);color:var(--gold);background:rgba(138,90,30,.08);text-decoration:none;cursor:pointer}
+  .btn:hover{background:rgba(138,90,30,.16)}
+  .btn.x{flex:0 0 auto;padding:8px 11px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,60px);opacity:0;transition:.3s;background:var(--night);color:#f6eeda;font-family:var(--sans);font-size:.82rem;padding:10px 18px;border-radius:99px;z-index:60;max-width:92vw;text-align:center}
+  .toast.show{transform:translate(-50%,0);opacity:1}
+  .foot{margin-top:44px;padding-top:16px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
+  .foot::before{content:"";display:block;height:8px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8;margin:-16px 0 16px}
+  .circ{font-style:italic;color:var(--cream-dim);text-align:center;margin:26px auto 0;max-width:640px;font-size:.98rem}
+  /* ʻohana corner + translator */
+  .ocorner{position:fixed;right:12px;bottom:12px;z-index:50;display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-family:var(--sans)}
+  .ocorner .ob{width:44px;height:44px;border-radius:99px;border:1px solid rgba(138,90,30,.5);background:rgba(251,246,234,.95);font-size:1.25rem;cursor:pointer;box-shadow:0 4px 14px rgba(44,31,18,.18);display:flex;align-items:center;justify-content:center;text-decoration:none}
+  .ocorner .ob:hover{background:#fff}
+  .olangp{display:none;background:rgba(251,246,234,.98);border:1px solid rgba(138,90,30,.45);border-radius:14px;padding:10px;max-height:46vh;overflow:auto;box-shadow:0 8px 24px rgba(44,31,18,.25)}
+  .olangp.open{display:block}
+  .olangp button{display:block;width:100%;text-align:left;background:none;border:none;font-family:var(--sans);font-size:.82rem;color:var(--cream);padding:5px 8px;border-radius:8px;cursor:pointer}
+  .olangp button:hover{background:rgba(138,90,30,.12)}
+  #google_translate_element{display:none}
+  @media (max-width:560px){ .nav{font-size:.76rem;gap:10px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="../">🌺 Home</a>
+    <a class="here" href="./">🔱 Triforce</a>
+    <a href="../ceremony/">🔥 Ceremony Hall</a>
+    <a href="../altar/">🎁 Gift Altar</a>
+    <a href="../wall/">🌐 Wall of 18</a>
+    <a href="../pulse/">🫀 Pulse</a>
+  </nav>
+
+  <div class="kicker">My Agent ʻOhana · Act II · the aliveline</div>
+  <h1>THE TRIFORCE <em>— three chains, one ʻohana</em><span id="mode-badge" class="badge mock">…</span></h1>
+  <p class="lede">Three living triangles breathe with the chains they stand on — ETH emerald, Base blue, BNB gold. The agents orbit as glowing nodes. Touch one to meet them.</p>
+
+  <div id="mockbar" class="mockbar" hidden>🟡 <b>MOCK DATA</b> — the subgraph endpoint didn't answer, so the triforce breathes on rehearsal data. Same fallback law as the Pulse.</div>
+
+  <div class="stage" id="stage">
+    <canvas id="tri" width="1080" height="760" aria-label="The Triforce — three living triangles with orbiting agent nodes"></canvas>
+    <div class="card" id="card" role="dialog" aria-label="agent card">
+      <div class="nm" id="c-nm">—</div>
+      <div class="ens" id="c-ens">—</div>
+      <div class="meta" id="c-meta"></div>
+      <div class="acts">
+        <a class="btn" id="c-gift" href="../altar/">🎁 gift</a>
+        <button class="btn" id="c-bless">🌺 bless</button>
+        <button class="btn x" id="c-close" aria-label="close">✕</button>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--eth)"></span><b>ETH</b> the spine — registry live on Sepolia</span>
+    <span><span class="dot" style="background:var(--base)"></span><b>BASE</b> second leg — x402 penny rail</span>
+    <span><span class="dot" style="background:var(--bnb)"></span><b>BNB</b> the ceremony chain — Agent Launch</span>
+    <span>· node glow = consent window (green open · gold paused · rose closed)</span>
+  </div>
+
+  <p class="circ">“Not a countdown — a heartbeat. The triforce doesn't wait for a date; it grows more alive with every block.”</p>
+
+  <div class="foot">
+    <div>source: <code id="src">—</code> · refreshes every 15s · Act II of the aliveline · CC0 · <a href="../wall/">the wall of 18</a></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ʻohana corner: home flower + translator, Hawaiian on top -->
+<div class="ocorner">
+  <div class="olangp" id="olangp"></div>
+  <button class="ob" id="olang" title="every language — a planet we share as one 🌍">🌐</button>
+  <a class="ob" href="../" title="the ʻohana home 🌺">🌺</a>
+</div>
+<div id="google_translate_element"></div>
+
+<script src="../config/deployments.js"></script>
+<script>
+"use strict";
+/* ═══ THE TRIFORCE — canvas life engine · zero build steps ═══
+   Live data: same endpoint law as web/pulse (Graph Studio my-agent-ohana), graceful mock fallback.
+   Chains without an indexed leg yet breathe in "awaiting" mode — quiet, honest, alive. */
+const D = window.OHANA_DEPLOYMENTS || {};
+const ENDPOINTS = (new URL(location.href).searchParams.get("endpoint")||"").split(",").filter(Boolean).length
+  ? new URL(location.href).searchParams.get("endpoint").split(",").map(s=>s.trim()).filter(Boolean)
+  : (D.subgraphEndpoints || []);
+const API_KEY = D.subgraphApiKey || "";
+const FAMILY = D.familyName || "agentohana.eth";
+
+const QUERY = `query Triforce {
+  pulseStats(id: "pulse") { totalAgents totalHires totalBlessings totalConsentChanges lastEventAt }
+  agents(first: 36, orderBy: launchedAt, orderDirection: desc) {
+    id agentId label consentStatus listed blessed blessCount hireCount ensNode launchedAt
+  }
+}`;
+const ZERO32 = "0x" + "0".repeat(64);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let MODE = "mock", STATS = null, AGENTS = [];
+
+function mockState(){
+  const now = Math.floor(Date.now()/1000);
+  return {
+    stats: { totalAgents:4, totalHires:1, totalBlessings:3, totalConsentChanges:1, lastEventAt:String(now-600) },
+    agents: [
+      { agentId:"1", label:"shaka",  consentStatus:"active",    listed:true,  blessed:true,  hireCount:0, ensNode:ZERO32 },
+      { agentId:"2", label:"pit",    consentStatus:"active",    listed:true,  blessed:true,  hireCount:0, ensNode:ZERO32 },
+      { agentId:"3", label:"ohana",  consentStatus:"active",    listed:true,  blessed:false, hireCount:0, ensNode:ZERO32 },
+      { agentId:"4", label:"terri",  consentStatus:"withdrawn", listed:false, blessed:true,  hireCount:1, ensNode:ZERO32 },
+    ]
+  };
+}
+
+async function fetchLive(){
+  if (!ENDPOINTS.length) throw new Error("no endpoint");
+  const results = await Promise.allSettled(ENDPOINTS.map(async ep => {
+    const res = await fetch(ep, { method:"POST",
+      headers:{ "content-type":"application/json", authorization:`Bearer ${API_KEY}` },
+      body: JSON.stringify({ query: QUERY }) });
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    const j = await res.json();
+    if (j.errors) throw new Error(j.errors.map(e=>e.message).join("; "));
+    return j.data;
+  }));
+  const ok = results.filter(r=>r.status==="fulfilled").map(r=>r.value);
+  if (!ok.length) throw new Error(results.map(r=>r.reason?.message||"?").join(" · "));
+  const agents = [], seen = new Set(); let stats = null;
+  for (const d of ok){
+    if (d.pulseStats) stats = d.pulseStats;
+    for (const a of (d.agents||[])) if (!seen.has(a.label)) { seen.add(a.label); agents.push(a); }
+  }
+  return { stats, agents };
+}
+
+async function refresh(){
+  $("src").textContent = ENDPOINTS.join(" , ") || "(no endpoint — mock)";
+  try {
+    const live = await fetchLive();
+    MODE = "live"; STATS = live.stats; AGENTS = live.agents;
+  } catch(e) {
+    MODE = "mock"; const m = mockState(); STATS = m.stats; AGENTS = m.agents;
+  }
+  $("mode-badge").className = "badge " + (MODE==="live"?"live":"mock");
+  $("mode-badge").textContent = MODE==="live" ? "🟢 live" : "🟡 mock";
+  $("mockbar").hidden = MODE==="live";
+  syncNodes();
+}
+
+/* ── the living canvas ── */
+const cv = $("tri"), cx = cv.getContext("2d");
+const DPR = Math.min(2, window.devicePixelRatio||1);
+function sizeCanvas(){
+  const w = cv.parentElement.clientWidth;
+  const h = Math.max(420, Math.min(760, Math.round(w*0.72)));
+  cv.width = Math.round(w*DPR); cv.height = Math.round(h*DPR);
+  cv.style.height = h+"px";
+}
+sizeCanvas(); addEventListener("resize", sizeCanvas);
+
+const CHAINS = [
+  { key:"eth",  name:"ETHEREUM", col:"#2e7d5b", glow:"rgba(46,125,91,",  live:()=>MODE==="live", note:()=>MODE==="live"?"registry live · Sepolia":"rehearsal", pos:0 },
+  { key:"base", name:"BASE",     col:"#2456c8", glow:"rgba(36,86,200,",  live:()=>!!(D.baseSepolia&&D.baseSepolia.registry), note:()=>D.baseSepolia&&D.baseSepolia.registry?"leg live":"awaiting its leg", pos:1 },
+  { key:"bnb",  name:"BNB",      col:"#c8930b", glow:"rgba(200,147,11,", live:()=>!!(D.bscTestnet&&D.bscTestnet.curve), note:()=>D.bscTestnet&&D.bscTestnet.curve?"curve live":"the ceremony awaits", pos:2 },
+];
+
+/* orbiting agent nodes (physics state kept between data refreshes) */
+let NODES = [];
+function syncNodes(){
+  const byLabel = new Map(NODES.map(n=>[n.a.label,n]));
+  NODES = AGENTS.map((a,i)=>{
+    const prev = byLabel.get(a.label);
+    return prev ? Object.assign(prev,{a}) : {
+      a, ang: Math.random()*Math.PI*2,
+      rr: 0.72 + (i%3)*0.13 + Math.random()*0.06,     /* orbit radius factor */
+      spd: (0.10 + Math.random()*0.12) * (i%2? 1:-1),  /* rad/s, alternating direction */
+      wob: Math.random()*Math.PI*2
+    };
+  });
+}
+
+let rings = [], lastEventSeen = 0;
+function maybeRing(){
+  const le = Number(STATS?.lastEventAt||0);
+  if (le && le !== lastEventSeen){ lastEventSeen = le; rings.push({t:0}); }
+}
+
+const consentCol = s => s==="active" ? "#3f7040" : s==="paused" ? "#8a5a1e" : s==="withdrawn" ? "#a13a4e" : "#7a6a55";
+
+function triPoints(cxp, cyp, r, rot){
+  const p=[]; for(let k=0;k<3;k++){ const a=rot + k*2*Math.PI/3 - Math.PI/2; p.push([cxp+r*Math.cos(a), cyp+r*Math.sin(a)]); } return p;
+}
+
+let t0 = performance.now();
+function draw(now){
+  const t = (now-t0)/1000;
+  const W = cv.width, H = cv.height;
+  cx.clearRect(0,0,W,H);
+  const cxp = W/2, cyp = H*0.46, R = Math.min(W,H)*0.30;
+
+  /* activity heartbeat: recency of last event drives global vigor 0.25..1 */
+  const ageS = STATS?.lastEventAt ? Math.max(0,(Date.now()/1000)-Number(STATS.lastEventAt)) : 1e9;
+  const vigor = 0.25 + 0.75*Math.exp(-ageS/86400);
+
+  /* expanding event rings */
+  maybeRing();
+  rings = rings.filter(r=>r.t<2.6);
+  for (const r of rings){
+    r.t += 1/60;
+    const rr = R*0.6 + r.t*R*1.1, al = Math.max(0, 0.35*(1-r.t/2.6));
+    cx.beginPath(); cx.arc(cxp,cyp,rr,0,Math.PI*2);
+    cx.strokeStyle = `rgba(138,90,30,${al})`; cx.lineWidth = 2*DPR; cx.stroke();
+  }
+
+  /* the three thrones of the triforce */
+  const seats = [
+    [cxp,            cyp - R*0.62],  /* top    — ETH   */
+    [cxp - R*0.60,   cyp + R*0.44],  /* left   — BASE  */
+    [cxp + R*0.60,   cyp + R*0.44],  /* right  — BNB   */
+  ];
+  CHAINS.forEach((ch,i)=>{
+    const isLive = ch.live();
+    const breathe = 1 + (isLive? 0.055*vigor : 0.028) * Math.sin(t*(isLive?1.4:0.7) + i*2.1);
+    const rot = t * (isLive? 0.10 : 0.045) * (i===1?-1:1);
+    const r = R*0.42*breathe;
+    const [sx,sy] = seats[i];
+    const pts = triPoints(sx,sy,r,rot);
+    const glowA = isLive ? (0.35+0.25*Math.sin(t*1.4+i)) * vigor : 0.14;
+    cx.save();
+    cx.shadowColor = ch.glow + Math.min(0.9,glowA+0.25) + ")";
+    cx.shadowBlur = (isLive? 34: 14)*DPR*breathe;
+    cx.beginPath(); cx.moveTo(pts[0][0],pts[0][1]); cx.lineTo(pts[1][0],pts[1][1]); cx.lineTo(pts[2][0],pts[2][1]); cx.closePath();
+    const g = cx.createLinearGradient(pts[0][0],pts[0][1],(pts[1][0]+pts[2][0])/2,(pts[1][1]+pts[2][1])/2);
+    g.addColorStop(0, ch.col); g.addColorStop(1, ch.glow + (isLive?0.55:0.3) + ")");
+    cx.fillStyle = g; cx.globalAlpha = isLive? 0.92 : 0.55; cx.fill();
+    cx.globalAlpha = 1; cx.lineWidth = 2.5*DPR; cx.strokeStyle = ch.col; cx.stroke();
+    cx.restore();
+    /* inner heart-line: pulse trace */
+    cx.save(); cx.globalAlpha = isLive?0.8:0.35; cx.strokeStyle = "#fdf8ec"; cx.lineWidth = 1.6*DPR;
+    cx.beginPath();
+    const hw = r*0.62;
+    for(let x=-hw;x<=hw;x+=2*DPR){
+      const ph = x/hw*Math.PI*2 + t*(isLive?3.2:1.2);
+      const y = Math.sin(ph)*Math.exp(-Math.pow(x/hw,2)*2.2)*r*0.16*(isLive?vigor:0.5);
+      x===-hw ? cx.moveTo(sx+x,sy+y+r*0.1) : cx.lineTo(sx+x,sy+y+r*0.1);
+    }
+    cx.stroke(); cx.restore();
+    /* label */
+    cx.font = `700 ${Math.round(11*DPR)}px ui-sans-serif,system-ui`;
+    cx.textAlign="center"; cx.fillStyle = ch.col;
+    cx.fillText(ch.name, sx, sy + r + 16*DPR);
+    cx.fillStyle = "rgba(59,44,30,.55)"; cx.font = `${Math.round(9*DPR)}px ui-sans-serif,system-ui`;
+    cx.fillText(ch.note(), sx, sy + r + 28*DPR);
+  });
+
+  /* stats heartline under the triforce */
+  if (STATS){
+    cx.font = `${Math.round(10*DPR)}px ui-sans-serif,system-ui`; cx.textAlign="center";
+    cx.fillStyle = "rgba(59,44,30,.7)";
+    cx.fillText(`${STATS.totalAgents} agents · ${STATS.totalBlessings} blessings · ${STATS.totalHires} hires · ${STATS.totalConsentChanges} consent flips`, cxp, H - 14*DPR);
+  }
+
+  /* orbiting agents */
+  for (const n of NODES){
+    n.ang += n.spd/60; n.wob += 1/60;
+    const orx = R*1.25*n.rr, ory = R*0.92*n.rr;
+    const x = cxp + Math.cos(n.ang)*orx, y = cyp + Math.sin(n.ang)*ory + Math.sin(n.wob*1.7)*4*DPR;
+    n.x=x; n.y=y; n.r = (n.a.blessed? 8.5:7)*DPR;
+    const col = consentCol(n.a.consentStatus);
+    cx.save();
+    cx.shadowColor = col; cx.shadowBlur = (10 + 6*Math.sin(t*2+n.wob))*DPR;
+    cx.beginPath(); cx.arc(x,y,n.r,0,Math.PI*2);
+    cx.fillStyle = col; cx.globalAlpha = n.a.listed===false? 0.45: 0.9; cx.fill();
+    cx.restore();
+    cx.font = `${Math.round(9.5*DPR)}px ui-sans-serif,system-ui`; cx.textAlign="center";
+    cx.fillStyle = "rgba(59,44,30,.8)";
+    cx.fillText((n.a.blessed?"🌺 ":"") + (n.a.label||("#"+n.a.agentId)), x, y - n.r - 5*DPR);
+  }
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+/* ── click → agent card ── */
+function pick(ev){
+  const rect = cv.getBoundingClientRect();
+  const x = (ev.clientX-rect.left) * (cv.width/rect.width);
+  const y = (ev.clientY-rect.top) * (cv.height/rect.height);
+  let best=null, bd=1e9;
+  for (const n of NODES){
+    const d = Math.hypot(n.x-x, n.y-y);
+    if (d < Math.max(22*DPR, n.r*2.6) && d < bd){ bd=d; best=n; }
+  }
+  return best;
+}
+cv.addEventListener("click", ev=>{
+  const n = pick(ev);
+  if (!n){ $("card").classList.remove("open"); return; }
+  const a = n.a;
+  $("c-nm").textContent = (a.blessed?"🌺 ":"") + (a.label || "agent #"+a.agentId);
+  $("c-ens").textContent = a.label ? `${a.label}.${FAMILY}` + (a.ensNode && a.ensNode!==ZERO32 ? " ⚓ anchored":"") : "—";
+  const win = a.consentStatus==="active" ? "consent window OPEN" : a.consentStatus==="paused" ? "consent window PAUSED" : a.consentStatus==="withdrawn" ? "consent window CLOSED" : "consent unknown";
+  $("c-meta").innerHTML =
+    `<span class="chip ${esc(a.consentStatus||"unknown")}">${esc(win)}</span>` +
+    (a.listed===false? `<span class="chip withdrawn">delisted</span>`:"") +
+    `<span class="chip unknown">${esc(a.hireCount||0)} hire${a.hireCount==1?"":"s"}</span>`;
+  $("c-gift").href = "../altar/?agent=" + encodeURIComponent(a.label||a.agentId);
+  $("c-bless").onclick = ()=>{
+    const gm = D.sepolia && D.sepolia.giftMarket;
+    toast(gm ? "🌺 blessing lane wired — GiftMarket "+gm.slice(0,10)+"… (testnet) — head to the Gift Altar"
+             : "🌺 blessing recorded in spirit — on-chain lane opens when Act I lands the GiftMarket");
+  };
+  $("card").classList.add("open");
+});
+$("c-close").addEventListener("click", ()=>$("card").classList.remove("open"));
+
+let toastT;
+function toast(msg){ const el=$("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),3600); }
+
+refresh(); setInterval(refresh, 15000);
+</script>
+<script>
+/* ʻohana translator — Hawaiian on top, a planet we share as one 🌍 */
+(function(){
+  var LANGS=[["haw","ʻŌlelo Hawaiʻi 🌺"],["en","English"],["es","Español"],["zh-CN","中文"],["hi","हिन्दी"],["ar","العربية"],["fr","Français"],["pt","Português"],["ja","日本語"],["de","Deutsch"],["ru","Русский"],["ko","한국어"],["it","Italiano"],["vi","Tiếng Việt"],["id","Bahasa"],["th","ไทย"],["tr","Türkçe"],["sw","Kiswahili"],["uk","Українська"]];
+  var p=document.getElementById('olangp');
+  p.innerHTML=LANGS.map(function(l){return '<button onclick="otr(\''+l[0]+'\')">'+l[1]+'</button>';}).join('');
+  document.getElementById('olang').addEventListener('click',function(){p.classList.toggle('open');});
+})();
+function otr(lang){
+  var proxy='https://translate.google.com/translate?sl=en&tl='+lang+'&u='+encodeURIComponent(location.href);
+  function clr(){var e='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';document.cookie=e;document.cookie=e+';domain='+location.hostname;}
+  if(lang==='en'){clr();location.reload();return;}
+  try{
+    document.cookie='googtrans=/en/'+lang+';path=/';
+    document.cookie='googtrans=/en/'+lang+';path=/;domain='+location.hostname;
+    if(window.google&&google.translate){location.reload();return;}
+  }catch(e){}
+  location.href=proxy;
+}
+function googleTranslateElementInit(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'haw,es,zh-CN,hi,ar,fr,pt,ru,ja,de,ko,it,vi,id,th,tr,pl,nl,sv,sw,uk',layout:google.translate.TranslateElement.InlineLayout.SIMPLE},'google_translate_element');}catch(e){}}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
