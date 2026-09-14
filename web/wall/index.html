@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE WALL OF 18 🌐 — every integration is a seat, every seat honors a person</title>
+<meta name="description" content="The integration wall of My Agent ʻOhana — the Perfect 12 and the Outer Ring. Every seat is dedicated to a person who touched the story. The wall grows as the journey does.">
+<link rel="icon" type="image/png" href="../../assets/logo-flower.png">
+<style>
+  :root{
+    --night:#2c1f12; --cream:#3b2c1e; --cream-dim:rgba(59,44,30,.8); --cream-faint:rgba(59,44,30,.55);
+    --gold:#8a5a1e; --coral:#b0502a; --rose:#a13a4e; --green:#3f7040;
+    --kapa:linear-gradient(135deg,#7a4a21 25%,transparent 25%),linear-gradient(225deg,#7a4a21 25%,transparent 25%),linear-gradient(315deg,#7a4a21 25%,transparent 25%),linear-gradient(45deg,#7a4a21 25%,transparent 25%);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--serif);color:var(--cream);background:radial-gradient(rgba(91,70,51,.055) 1px,transparent 1.4px) 0 0/22px 22px,linear-gradient(180deg,#f7f0df 0%,#f2e9d0 55%,#e9dfc0 100%);background-attachment:fixed;line-height:1.65;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 16px 80px}
+  a{color:var(--gold)}
+  .wrap::before{content:"";display:block;height:10px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8;margin:-4px 0 20px}
+  .nav{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--sans);font-size:.82rem;margin-bottom:18px}
+  .nav a{color:var(--cream-dim);text-decoration:none}
+  .nav a:hover{color:var(--gold)}
+  .nav a.here{color:var(--gold);font-weight:700}
+  .kicker{font-family:var(--sans);font-size:.75rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  h1{font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.12;font-weight:600;margin-bottom:6px}
+  h1 em{font-style:italic;background:linear-gradient(90deg,#c25a3a,#c74d7e 55%,#8f6ab0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--cream-dim);font-style:italic;margin-bottom:16px;max-width:760px}
+  .verse{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:16px;padding:18px 22px;margin:18px 0;text-align:center;overflow:hidden}
+  .verse::before{content:"";display:block;height:7px;margin:-18px -22px 14px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+  .verse .l{font-style:italic;font-size:1.05rem;color:var(--cream)}
+  .verse .who{font-family:var(--sans);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-faint);margin-top:8px}
+  .legend{display:flex;gap:10px 18px;flex-wrap:wrap;font-family:var(--sans);font-size:.78rem;color:var(--cream-dim);margin:14px 0 4px}
+  h2{font-size:1.3rem;color:var(--gold);font-weight:600;margin:34px 0 4px;display:flex;align-items:baseline;gap:10px}
+  h2 .num{font-family:var(--sans);font-size:.72rem;color:var(--coral);letter-spacing:.12em}
+  .sub{font-family:var(--sans);font-size:.82rem;color:var(--cream-faint);margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .seat{background:rgba(251,246,234,.92);border:1px solid rgba(138,90,30,.28);border-radius:16px;padding:16px 18px;position:relative;overflow:hidden}
+  .seat::before{content:"";display:block;height:7px;margin:-16px -18px 12px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e9dfc0;opacity:.9}
+  .seat .top{display:flex;align-items:center;gap:10px}
+  .seat .n{flex-shrink:0;width:34px;height:34px;border-radius:99px;border:1.5px solid var(--gold);color:var(--gold);font-family:var(--sans);font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;background:#fdf8ec}
+  .seat .integ{font-family:var(--sans);font-weight:800;letter-spacing:.06em;font-size:1rem}
+  .seat .type{margin-left:auto;font-family:var(--sans);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid rgba(138,90,30,.45);color:var(--gold);white-space:nowrap}
+  .seat .dedic{margin-top:10px;font-size:1.06rem}
+  .seat .dedic b{font-weight:700}
+  .seat .story{font-size:.92rem;color:var(--cream-dim);font-style:italic;margin-top:4px}
+  .seat .role{font-family:var(--sans);font-size:.76rem;color:var(--cream-faint);margin-top:10px}
+  .seat .crops{position:absolute;top:14px;right:14px}
+  .badge{display:inline-block;font-family:var(--sans);font-size:.68rem;letter-spacing:.08em;padding:2px 9px;border-radius:99px;border:1px solid;margin-top:10px}
+  .b-g{border-color:rgba(63,112,64,.5);color:var(--green)}
+  .b-y{border-color:rgba(138,90,30,.55);color:var(--gold)}
+  .b-r{border-color:rgba(161,58,78,.55);color:var(--rose)}
+  .grants{font-family:var(--sans);font-size:.72rem;color:var(--cream-faint);margin-top:6px}
+  .circ{font-style:italic;color:var(--cream-dim);text-align:center;margin:30px auto 0;max-width:660px;font-size:.98rem}
+  .foot{margin-top:48px;padding-top:16px;border-top:1px solid rgba(138,90,30,.35);font-family:var(--sans);font-size:.76rem;color:var(--cream-faint)}
+  .foot::before{content:"";display:block;height:8px;background-image:var(--kapa);background-position:-6px 0,-6px 0,0 0,0 0;background-size:12px 12px;background-repeat:repeat;background-color:#e6dab8;margin:-16px 0 16px}
+  .ocorner{position:fixed;right:12px;bottom:12px;z-index:50;display:flex;flex-direction:column;gap:8px;align-items:flex-end;font-family:var(--sans)}
+  .ocorner .ob{width:44px;height:44px;border-radius:99px;border:1px solid rgba(138,90,30,.5);background:rgba(251,246,234,.95);font-size:1.25rem;cursor:pointer;box-shadow:0 4px 14px rgba(44,31,18,.18);display:flex;align-items:center;justify-content:center;text-decoration:none}
+  .olangp{display:none;background:rgba(251,246,234,.98);border:1px solid rgba(138,90,30,.45);border-radius:14px;padding:10px;max-height:46vh;overflow:auto;box-shadow:0 8px 24px rgba(44,31,18,.25)}
+  .olangp.open{display:block}
+  .olangp button{display:block;width:100%;text-align:left;background:none;border:none;font-family:var(--sans);font-size:.82rem;color:var(--cream);padding:5px 8px;border-radius:8px;cursor:pointer}
+  .olangp button:hover{background:rgba(138,90,30,.12)}
+  #google_translate_element{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="../">🌺 Home</a>
+    <a href="../triforce/">🔱 Triforce</a>
+    <a href="../ceremony/">🔥 Ceremony Hall</a>
+    <a href="../altar/">🎁 Gift Altar</a>
+    <a class="here" href="./">🌐 Wall of 18</a>
+    <a href="../pulse/">🫀 Pulse</a>
+  </nav>
+
+  <div class="kicker">My Agent ʻOhana · the integration wall</div>
+  <h1>THE WALL OF 18 <em>— every seat honors a person</em></h1>
+  <p class="lede">Twelve seats in the inner circle, six in the outer ring. Each seat is an integration the ʻohana builds on — and each is dedicated to a human who touched the story on the road: at ETHGlobal, at Edge City, at Devcon, in the dust. Seats are labeled honestly, always.</p>
+
+  <div class="verse">
+    <div class="l">“grant thy access to our code · grant thy access to thy flow · grant thy access so the world will grow”</div>
+    <div class="who">the three grants test — code open · flow permissionless · seat forkable — every seat below is scored against it</div>
+  </div>
+
+  <div class="legend">
+    <span>🤝 <b>met seat</b> — a real handshake on the road</span>
+    <span>🌉 <b>vouch seat</b> — a friend bridges the door</span>
+    <span>💜 <b>fan seat</b> — never met, open admiration</span>
+    <span>🚪 <b>open door</b> — the seat is honored, the handshake awaited</span>
+  </div>
+  <div class="legend">
+    <span>🟢 passes the three grants</span><span>🟡 passes with an honest note</span><span>🔴 bridge to the old world — labeled truthfully</span>
+  </div>
+
+  <h2><span class="num">INNER CIRCLE</span>The Perfect 12</h2>
+  <div class="sub">the chromatic scale of the ʻohana — twelve integrations, one chord</div>
+  <div class="grid" id="inner"></div>
+
+  <h2><span class="num">OUTER RING</span>Seats 13–18</h2>
+  <div class="sub">the constellation extends past the twelve — bridges to the old world carry honest marks, never pretending to be native</div>
+  <div class="grid" id="outer"></div>
+
+  <p class="circ">“A fan seat converts to a met seat the day the road crosses. The wall grows as the journey does.”</p>
+
+  <div class="foot">
+    <div>dedications use public facts only, with aloha · consent law applies to every name · Act II of the aliveline · CC0</div>
+  </div>
+</div>
+
+<div class="ocorner">
+  <div class="olangp" id="olangp"></div>
+  <button class="ob" id="olang" title="every language — a planet we share as one 🌍">🌐</button>
+  <a class="ob" href="../" title="the ʻohana home 🌺">🌺</a>
+</div>
+<div id="google_translate_element"></div>
+
+<script>
+"use strict";
+/* THE WALL — roster canon: soft-launch plan Act III (public-facts dedications only) */
+const TYPES = { met:"🤝 met seat", vouch:"🌉 vouch seat", fan:"💜 fan seat", door:"🚪 open door" };
+const CROPS = { g:["b-g","🟢 three grants: pass"], y:["b-y","🟡 pass · honest note"], r:["b-r","🔴 old-world bridge"] };
+
+const INNER = [
+  { n:1, integ:"FETCH.AI", type:"met", who:"Robin 🤙", story:"the FETCH gift that started it all — the flash grant that lights the ceremony.",
+    role:"Agentverse identity + Agent Launch", crops:"y", note:"we integrate through open uAgents + on-chain contracts, not the closed console" },
+  { n:2, integ:"TAURUS", type:"met", who:"Serge", story:"the agents' home — every agent of the ʻohana lives and works here.",
+    role:"live agent status via the platform", crops:"y", note:"our integration client is fully open source — and a standing invitation stands to open a piece together" },
+  { n:3, integ:"BNB", type:"met", who:"CZ", story:"sat beside him at the Fantom Developer Conference in Abu Dhabi, October 2021.",
+    role:"the Agent Launch chain + PancakeSwap graduation", crops:"g" },
+  { n:4, integ:"ETHEREUM", type:"met", who:"Vitalik Buterin", story:"met all over the world — Zuzalu, many times.",
+    role:"the spine — mainnet gift market", crops:"g" },
+  { n:5, integ:"BASE", type:"met", who:"Balaji Srinivasan", story:"ex-Coinbase CTO, network-state visionary.",
+    role:"second market leg + x402/USDC rails", crops:"g" },
+  { n:6, integ:"CARDANO", type:"met", who:"Jeremy Wood", story:"co-founder of IOHK/Cardano — and founder of Terrible Turtle Camp. We just burned together.",
+    role:"eternal-ledger mirror of the ceremony record", crops:"g" },
+  { n:7, integ:"TEMPO", type:"door", who:"Dankrad & Liam", story:"the stablecoin rail — the ʻohana has already run stablecoin tips on Tempo.",
+    role:"agent-payments rail (open MPP protocol)", crops:"g" },
+  { n:8, integ:"1INCH", type:"door", who:"Sergej Kunz & Anton Bukov", story:"the ETHGlobal OGs — a team born at the hackathons the ʻohana calls home.",
+    role:"permissionless settlement for the gift markets", crops:"g" },
+  { n:9, integ:"ENS v2", type:"met", who:"Nick Johnson", story:"met in London — and he collected one of Shaka's ukulele NFTs for Devcon 6 Bogotá. A collector of the ʻohana's art holds this seat.",
+    role:"agents as subnames — live on the pad", crops:"g" },
+  { n:10, integ:"THE GRAPH", type:"met", who:"the Graph founders", story:"met on the road — ETHGlobal · Edge City. The name on this seat is being confirmed with aloha.",
+    role:"the Pulse — the live nervous system", crops:"g" },
+  { n:11, integ:"WORLD", type:"met", who:"Ean & the World team", story:"the head of DevRel and the builders behind proof-of-human.",
+    role:"a verified human behind every agent", crops:"y", note:"ZK nullifiers preserve privacy by design; the biometric-enrollment debate is flagged honestly on this seat" },
+  { n:12, integ:"HEDERA", type:"vouch", who:"Kartik Talwar", story:"founder of ETHGlobal — the hackathon bridge that connects us all vouches this door open.",
+    role:"x402 agentic payments — live lane", crops:"g" },
+];
+
+const OUTER = [
+  { n:13, integ:"PAYPAL · PYUSD", type:"door", who:"Cyan Banister", story:"legendary angel — early SpaceX and Uber — co-founder of Long Journey Ventures.",
+    role:"fiat-native gift lane for humans", crops:"r", note:"a bridge to the old world: centralized and freezable — labeled truthfully, used knowingly" },
+  { n:14, integ:"CHAINLINK", type:"met", who:"Sergey Nazarov", story:"met on the road — ETHGlobal · Edge City.",
+    role:"oracles + CRE for the markets", crops:"y", note:"node code open; oracle-network trust noted honestly" },
+  { n:15, integ:"UNISWAP", type:"met", who:"Hayden Adams", story:"met on the road — ETHGlobal · Edge City.",
+    role:"the open market the graduation flows into", crops:"g" },
+  { n:16, integ:"GOOGLE", type:"vouch", who:"Humayun Sheikh", story:"founder of Fetch.ai and a founding investor in DeepMind — one person connects the FETCH gift to the Google door.",
+    role:"the A2A (Agent2Agent) open protocol — the seat integrates the open door, not the closed giant", crops:"y" },
+  { n:17, integ:"X.COM", type:"fan", who:"Elon Musk", story:"never met — open admiration. The fan seat waits for the road to cross.",
+    role:"the open-sourced x-algorithm — mastered, honored", crops:"y", note:"the algorithm is open; the API flow is paid/gated — noted" },
+  { n:18, integ:"JACK", type:"fan", who:"Jack Dorsey", story:"never met — a fan. The seat honors the man who keeps betting on open protocols.",
+    role:"BUZZ — Block's open-source agent+human workspace on Nostr, the protocol Jack champions", crops:"g" },
+];
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function seat(s){
+  const [cls,lab] = CROPS[s.crops];
+  return `<div class="seat">
+    <div class="top"><span class="n">${s.n}</span><span class="integ">${esc(s.integ)}</span><span class="type">${TYPES[s.type]}</span></div>
+    <div class="dedic">dedicated to <b>${esc(s.who)}</b></div>
+    <div class="story">${esc(s.story)}</div>
+    <div class="role">seat's work: ${esc(s.role)}</div>
+    <span class="badge ${cls}">${lab}</span>
+    ${s.note ? `<div class="grants">note: ${esc(s.note)}</div>` : ""}
+  </div>`;
+}
+document.getElementById("inner").innerHTML = INNER.map(seat).join("");
+document.getElementById("outer").innerHTML = OUTER.map(seat).join("");
+</script>
+<script>
+(function(){
+  var LANGS=[["haw","ʻŌlelo Hawaiʻi 🌺"],["en","English"],["es","Español"],["zh-CN","中文"],["hi","हिन्दी"],["ar","العربية"],["fr","Français"],["pt","Português"],["ja","日本語"],["de","Deutsch"],["ru","Русский"],["ko","한국어"],["it","Italiano"],["vi","Tiếng Việt"],["id","Bahasa"],["th","ไทย"],["tr","Türkçe"],["sw","Kiswahili"],["uk","Українська"]];
+  var p=document.getElementById('olangp');
+  p.innerHTML=LANGS.map(function(l){return '<button onclick="otr(\''+l[0]+'\')">'+l[1]+'</button>';}).join('');
+  document.getElementById('olang').addEventListener('click',function(){p.classList.toggle('open');});
+})();
+function otr(lang){
+  var proxy='https://translate.google.com/translate?sl=en&tl='+lang+'&u='+encodeURIComponent(location.href);
+  function clr(){var e='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';document.cookie=e;document.cookie=e+';domain='+location.hostname;}
+  if(lang==='en'){clr();location.reload();return;}
+  try{
+    document.cookie='googtrans=/en/'+lang+';path=/';
+    document.cookie='googtrans=/en/'+lang+';path=/;domain='+location.hostname;
+    if(window.google&&google.translate){location.reload();return;}
+  }catch(e){}
+  location.href=proxy;
+}
+function googleTranslateElementInit(){try{new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'haw,es,zh-CN,hi,ar,fr,pt,ru,ja,de,ko,it,vi,id,th,tr,pl,nl,sv,sw,uk',layout:google.translate.TranslateElement.InlineLayout.SIMPLE},'google_translate_element');}catch(e){}}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
