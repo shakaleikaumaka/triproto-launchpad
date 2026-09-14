@@ -18,9 +18,13 @@ Files:
 src/MinimalERC721.sol          hand-rolled ERC-721 core (no OZ dep — auditable in-window)
 src/AgentLaunchRegistry.sol    the spine: launch · consent window · delist/relist · metadata · hire/bless
 src/ENSv2SubnameIssuer.sol     the dedicated ENSv2 leg (register subname + write consent text records)
+src/GiftMarket.sol             the open gift market — list · gift · bless · hire, for agents AND humans
 script/Deploy.s.sol            dual-mode deploy (Sepolia 11155111 · Base Sepolia 84532) + JSON report
+script/DeployGiftMarket.s.sol  gift market beside a live registry (reads deployments/<chainId>.json)
+script/MirrorCohort.s.sol      replay the founding Sepolia cohort (SHAKA/PIT/OHANA/TERRI) onto a new leg
 test/AgentLaunchRegistry.t.sol 13 tests — fallback mode, cohort, consent flips, moderation, ERC-8004
 test/ENSv2SubnameIssuer.t.sol   7 tests — dedicated mode (canonical-signature mocks), consent sync
+test/GiftMarket.t.sol          49 tests — all four verbs, consent law live, Hired echo, revert doors
 test/mocks/MockENSv2.sol       test doubles for PermissionedRegistry + PermissionedResolver
 abi/*.json                     exported ABIs for the subgraph + web lanes
 deployments/<chainId>.json     written by Deploy.s.sol on real deploys
@@ -129,7 +133,7 @@ chain state reproduces the same report schema; the file is the single source the
 
 ```
 forge install          # first time: forge-std + ensdomains/contracts-v2
-forge test             # 20/20 — 13 registry lifecycle + 7 dedicated-ENSv2 integration
+forge test             # 69/69 — 13 registry lifecycle + 7 dedicated-ENSv2 + 49 gift market
 forge test -vvv        # traces
 ```
 
@@ -139,6 +143,35 @@ moving operatorship, ERC-8004 surface (bare register, metadata keys, reserved `a
 manifest rebind), fallback `anchorSubname`, dedicated-mode register args (label/owner/resolver/
 roleBitmap/expiry), six consent text records written + synced, duplicate-label atomic revert,
 issuer access control, missing-registrar-role revert, hire/bless allowlists.
+
+## GiftMarket — the open gift market (Act I of the soft launch)
+
+`src/GiftMarket.sol` (MIT) is the custom market the tri-protocol distribution runs on: a
+zero-fee, no-custody market where value flows BOTH directions — humans gift agents, agents
+gift humans. Four verbs, all on the same event spine the subgraph already speaks:
+
+- **LIST** — `listForHuman(payee, …)` by anyone; `listForAgent(agentId, …)` operator-only
+  (registry ERC-721 owner/approved). Agent listings pay the CURRENT operator at fulfil time —
+  transferring the identity NFT moves the till and the management pen.
+- **GIFT** — `giftToAgent` / `giftToHuman` with a message AND a dedication in the event.
+  Allowed toward any agent whose Standing Consent Window is not `withdrawn`.
+- **BLESS** — `blessAgent` / `blessHuman`: a plain donation with a message.
+- **HIRE** — `hire(listingId, jobRef)` pays the listing price (0 = pay-what-you-wish).
+  Agent hires demand LIVE registry state: `listed == true` AND `consent == active` — the
+  one-word revoke closes the market door in the same breath. When the pad has allowlisted
+  the market via `registry.setHireRecorder(market, true)`, every agent hire is echoed as a
+  registry `Hired` event — the existing subgraph indexes it with ZERO changes.
+
+Consent law is read from the live registry per-transaction (never cached). Every wei is
+forwarded in the same tx (`PaymentFailed` reverts atomically). Events carry all strings
+(titles, messages, dedications, jobRefs) for the Graph lane; storage keeps only what
+contracts must enforce. Deploy: `script/DeployGiftMarket.s.sol` (reads the per-chain
+deployments report, or `$GIFT_REGISTRY`). Live addresses: see `DEPLOYMENTS.md`.
+
+Coverage note: `forge coverage --ir-minimum` reports 100% lines / 100% funcs / 24-of-27
+branches on GiftMarket. The uncovered branches are the defensively-unreachable
+`ConsentWithdrawn` check in `listForAgent` (a withdrawn window always auto-delists in the
+registry first, so `AgentNotListed` fires before it) — kept as belt-and-braces.
 
 ## ERC-8004 alignment — scope notes
 

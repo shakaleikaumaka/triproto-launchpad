@@ -1,0 +1,833 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "registry_",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "agentReceived",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "blessAgent",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "blessingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "blessHuman",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "blessingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "closeListing",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getListing",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "lister",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "payee",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "kind",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "active",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "giftToAgent",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "dedication",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "giftToHuman",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "dedication",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "hire",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "jobRef",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "humanReceived",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "listForAgent",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "rail",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "listForHuman",
+    "inputs": [
+      {
+        "name": "payee",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "rail",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "listings",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "lister",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "payee",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "kind",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "active",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "registry",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IAgentLaunchRegistry"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalBlessings",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalGifts",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalHires",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalListings",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "updateListing",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "BlessingSent",
+    "inputs": [
+      {
+        "name": "blessingId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "kind",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "from",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "to",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GiftSent",
+    "inputs": [
+      {
+        "name": "giftId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "kind",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "from",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "to",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "dedication",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ItemListed",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "kind",
+        "type": "uint8",
+        "indexed": true,
+        "internalType": "uint8"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "payee",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "lister",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "rail",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ListingClosed",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "closedBy",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ListingHired",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "client",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "payee",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "jobRef",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ListingUpdated",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "AgentNotListed",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ConsentNotActive",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "consent",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ConsentWithdrawn",
+    "inputs": [
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ListingInactive",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NoSuchListing",
+    "inputs": [
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NotAgentOperator",
+    "inputs": [
+      {
+        "name": "caller",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "agentId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NotLister",
+    "inputs": [
+      {
+        "name": "caller",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "listingId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "PaymentFailed",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "SelfGift",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "WrongPrice",
+    "inputs": [
+      {
+        "name": "sent",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ZeroAmount",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "ZeroRecipient",
+    "inputs": []
+  }
+]
