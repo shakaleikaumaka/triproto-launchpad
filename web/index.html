@@ -24,15 +24,17 @@ window.OSO_PAD_CONFIG = {
   chains: {
     11155111: {
       key: 'eth', name: 'ETH · Sepolia', role: 'our main market',
-      rpc: 'https://ethereum-sepolia-rpc.publicnode.com',
+      rpc: 'https://sepolia.gateway.tenderly.co', // publicnode prunes logs to ~10k blocks — tenderly keeps full history
       explorer: 'https://sepolia.etherscan.io',
       address: '0x62412fcA6437b914EDD87b85455682Ec73968347', // AgentLaunchRegistry (Sepolia, deployed 2026-09-13)
+      deployBlock: 11692692,                // read events from birth (public RPCs cap getLogs ranges)
     },
     84532: {
       key: 'base', name: 'BASE · Base Sepolia', role: 'our L2 market',
-      rpc: 'https://base-sepolia-rpc.publicnode.com',
+      rpc: 'https://sepolia.base.org',
       explorer: 'https://sepolia.basescan.org',
-      address: '',                          // TBD — AgentLaunchRegistry (Lane A)
+      address: '0xAfd78515B0Ef275595547d9Cc0207aE326bd8a34', // AgentLaunchRegistry (Base Sepolia — Act I)
+      deployBlock: 46823445,
     },
     97: {
       key: 'bnb', name: 'BNB · honored lane', role: 'agent-launch.ai — mass appreciation',
@@ -45,8 +47,10 @@ window.OSO_PAD_CONFIG = {
   // Expected registry surface (human-readable ABI, ethers v6).
   // MIRROR of contracts/AgentLaunchRegistry.sol (Lane A) — refresh on deploy.
   registryAbi: [
-    'event AgentLaunched(uint256 indexed agentId, address indexed operator, string name, string symbol, string manifestURI, string endpoint)',
-    'event ConsentChanged(uint256 indexed agentId, uint8 window)',
+    // real deployed AgentLaunchRegistry signatures (integration fix: the old imagined
+    // signatures had different topic0 hashes, so live reads always decoded 0 events)
+    'event AgentLaunched(uint256 indexed agentId, address indexed operator, bytes32 indexed manifestHash, string manifestURI, string serviceEndpoint, string label, uint64 expiry)',
+    'event ConsentChanged(uint256 indexed agentId, uint8 indexed status, address indexed changedBy, string consentContact, string pitPointer)',
     'event Hired(uint256 indexed agentId, address indexed client, uint256 amount, string jobURI)',
     'event Blessed(uint256 indexed agentId, address indexed by)',
     'function launch(address operator, string name, string symbol, string manifestURI, string endpoint) returns (uint256 agentId)',
@@ -233,6 +237,10 @@ window.OSO_PAD_CONFIG = {
     <nav class="topnav">
       <a href="#launch">Launch</a>
       <a href="#launched">Launched ʻOhana</a>
+      <a href="./triforce/">🔱 Triforce</a>
+      <a href="./ceremony/">🔥 Ceremony</a>
+      <a href="./altar/">🎁 Altar</a>
+      <a href="./wall/">🌐 Wall of 18</a>
       <a href="./pulse/">Pulse</a>
       <a href="./whitepaper.html">White paper</a>
       <a class="btn small" href="#launch" id="nav-connect">Connect wallet</a>
@@ -445,7 +453,10 @@ function ensNameOf(l) {
 function renderAgents() {
   const root = $('agents');
   root.innerHTML = '';
+  /* once an agent is read live from chain, its preview seed card steps aside */
+  const liveNames = new Set([...listings.values()].filter((l) => l.source === 'live').map((l) => (l.name || '').toUpperCase()));
   for (const l of listings.values()) {
+    if (l.source === 'preview' && liveNames.has((l.name || '').toUpperCase())) continue;
     const card = document.createElement('div');
     card.className = 'agent' + (l.consent === 'withdrawn' ? ' withdrawn' : '');
     const worldBadge = l.world
@@ -485,22 +496,26 @@ async function loadLiveEvents() {
     try {
       const provider = new JsonRpcProvider(c.rpc);
       const reg = new Contract(c.address, CFG.registryAbi, provider);
-      const launched = await reg.queryFilter('AgentLaunched', -60000);
+      /* from the registry's birth block when known — a fixed -60000 window tripped
+         public-RPC getLogs range caps (>50k blocks) and silently killed live reads */
+      const fromBlock = c.deployBlock ?? -45000;
+      const launched = await reg.queryFilter('AgentLaunched', fromBlock);
       for (const ev of launched) {
         const id = `${chainId}:${ev.args.agentId.toString()}`;
+        const label = ev.args.label || `agent-${ev.args.agentId}`;
         listings.set(id, {
-          id, emoji: '🤖', name: ev.args.name, symbol: ev.args.symbol,
+          id, emoji: '🤖', name: label.toUpperCase(), symbol: label.toUpperCase(),
           desc: (ev.args.manifestURI || '').slice(0, 120),
           operator: ev.args.operator, consent: 'active',
           world: CFG.world.verifiedOperators.map((x) => x.toLowerCase()).includes((ev.args.operator || '').toLowerCase()),
-          cameo: (ev.args.symbol || '').toUpperCase() === 'TERRI',
+          cameo: label.toUpperCase() === 'TERRI',
           source: 'live', chainId,
         });
       }
-      for (const ev of await reg.queryFilter('ConsentChanged', -60000)) {
+      for (const ev of await reg.queryFilter('ConsentChanged', fromBlock)) {
         const id = `${chainId}:${ev.args.agentId.toString()}`;
         const l = listings.get(id);
-        if (l) l.consent = WINDOWS[Number(ev.args.window)] || 'active';
+        if (l) l.consent = WINDOWS[Number(ev.args.status)] || 'active';
       }
     } catch (e) {
       console.warn(`[pad] live read failed on ${c.name}:`, e?.shortMessage || e?.message || e);

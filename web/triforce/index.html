@@ -134,6 +134,8 @@
    Live data: same endpoint law as web/pulse (Graph Studio my-agent-ohana), graceful mock fallback.
    Chains without an indexed leg yet breathe in "awaiting" mode — quiet, honest, alive. */
 const D = window.OHANA_DEPLOYMENTS || {};
+/* on-chain leg state — filled by the chainlens module script below (read-only public RPCs) */
+const LEGS = window.OHANA_LEGS = { eth:null, base:null };
 const ENDPOINTS = (new URL(location.href).searchParams.get("endpoint")||"").split(",").filter(Boolean).length
   ? new URL(location.href).searchParams.get("endpoint").split(",").map(s=>s.trim()).filter(Boolean)
   : (D.subgraphEndpoints || []);
@@ -187,7 +189,9 @@ async function fetchLive(){
 }
 
 async function refresh(){
-  $("src").textContent = ENDPOINTS.join(" , ") || "(no endpoint — mock)";
+  $("src").textContent = (ENDPOINTS.join(" , ") || "(no endpoint — mock)")
+    + (D.sepolia&&D.sepolia.giftMarket ? " + GiftMarket@Sepolia" : "")
+    + (D.baseSepolia&&D.baseSepolia.registry ? " + registry@BaseSepolia (public RPC)" : "");
   try {
     const live = await fetchLive();
     MODE = "live"; STATS = live.stats; AGENTS = live.agents;
@@ -212,8 +216,19 @@ function sizeCanvas(){
 sizeCanvas(); addEventListener("resize", sizeCanvas);
 
 const CHAINS = [
-  { key:"eth",  name:"ETHEREUM", col:"#2e7d5b", glow:"rgba(46,125,91,",  live:()=>MODE==="live", note:()=>MODE==="live"?"registry live · Sepolia":"rehearsal", pos:0 },
-  { key:"base", name:"BASE",     col:"#2456c8", glow:"rgba(36,86,200,",  live:()=>!!(D.baseSepolia&&D.baseSepolia.registry), note:()=>D.baseSepolia&&D.baseSepolia.registry?"leg live":"awaiting its leg", pos:1 },
+  { key:"eth",  name:"ETHEREUM", col:"#2e7d5b", glow:"rgba(46,125,91,",
+    live:()=>MODE==="live" || !!LEGS.eth,
+    note:()=>{
+      const m = LEGS.eth && LEGS.eth.market;
+      if (m) return `registry + gift market · ${m.gifts} gift${m.gifts==1?"":"s"} · ${m.blessings} blessing${m.blessings==1?"":"s"}`;
+      return MODE==="live" ? "registry live · Sepolia" : "rehearsal";
+    }, pos:0 },
+  { key:"base", name:"BASE",     col:"#2456c8", glow:"rgba(36,86,200,",
+    live:()=>!!LEGS.base,
+    note:()=>{
+      if (LEGS.base) return `leg live · ${LEGS.base.totalAgents} agents mirrored` + (LEGS.base.market ? ` · ${LEGS.base.market.gifts+LEGS.base.market.blessings+LEGS.base.market.hires} market tx` : "");
+      return D.baseSepolia && D.baseSepolia.registry ? "reading the leg…" : "awaiting its leg";
+    }, pos:1 },
   { key:"bnb",  name:"BNB",      col:"#c8930b", glow:"rgba(200,147,11,", live:()=>!!(D.bscTestnet&&D.bscTestnet.curve), note:()=>D.bscTestnet&&D.bscTestnet.curve?"curve live":"the ceremony awaits", pos:2 },
 ];
 
@@ -232,10 +247,19 @@ function syncNodes(){
   });
 }
 
-let rings = [], lastEventSeen = 0;
+let rings = [], lastEventSeen = 0, lastMarketSeen = -1;
+function marketTotal(){
+  let n = 0;
+  for (const leg of [LEGS.eth, LEGS.base]) if (leg && leg.market) n += leg.market.gifts + leg.market.blessings + leg.market.hires;
+  return n;
+}
 function maybeRing(){
   const le = Number(STATS?.lastEventAt||0);
   if (le && le !== lastEventSeen){ lastEventSeen = le; rings.push({t:0}); }
+  /* GiftMarket heartbeat: a new Gifted/Blessed/Hired on either leg sends a ring too */
+  const mt = marketTotal();
+  if (lastMarketSeen >= 0 && mt > lastMarketSeen) rings.push({t:0});
+  if (mt > 0 || LEGS.eth || LEGS.base) lastMarketSeen = mt;
 }
 
 const consentCol = s => s==="active" ? "#3f7040" : s==="paused" ? "#8a5a1e" : s==="withdrawn" ? "#a13a4e" : "#7a6a55";
@@ -251,8 +275,10 @@ function draw(now){
   cx.clearRect(0,0,W,H);
   const cxp = W/2, cyp = H*0.46, R = Math.min(W,H)*0.30;
 
-  /* activity heartbeat: recency of last event drives global vigor 0.25..1 */
-  const ageS = STATS?.lastEventAt ? Math.max(0,(Date.now()/1000)-Number(STATS.lastEventAt)) : 1e9;
+  /* activity heartbeat: recency of last event (subgraph OR GiftMarket) drives global vigor 0.25..1 */
+  let lastBeat = Number(STATS?.lastEventAt || 0);
+  for (const leg of [LEGS.eth, LEGS.base]) if (leg && leg.lastEventAt) lastBeat = Math.max(lastBeat, leg.lastEventAt);
+  const ageS = lastBeat ? Math.max(0,(Date.now()/1000)-lastBeat) : 1e9;
   const vigor = 0.25 + 0.75*Math.exp(-ageS/86400);
 
   /* expanding event rings */
@@ -310,7 +336,12 @@ function draw(now){
   if (STATS){
     cx.font = `${Math.round(10*DPR)}px ui-sans-serif,system-ui`; cx.textAlign="center";
     cx.fillStyle = "rgba(59,44,30,.7)";
-    cx.fillText(`${STATS.totalAgents} agents · ${STATS.totalBlessings} blessings · ${STATS.totalHires} hires · ${STATS.totalConsentChanges} consent flips`, cxp, H - 14*DPR);
+    let line = `${STATS.totalAgents} agents · ${STATS.totalBlessings} blessings · ${STATS.totalHires} hires · ${STATS.totalConsentChanges} consent flips`;
+    if (lastMarketSeen > 0){
+      let g=0,b=0; for (const leg of [LEGS.eth, LEGS.base]) if (leg&&leg.market){ g+=leg.market.gifts; b+=leg.market.blessings; }
+      line += ` · 🎁 ${g}+🌺 ${b} on the gift market`;
+    }
+    cx.fillText(line, cxp, H - 14*DPR);
   }
 
   /* orbiting agents */
@@ -370,6 +401,19 @@ let toastT;
 function toast(msg){ const el=$("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),3600); }
 
 refresh(); setInterval(refresh, 15000);
+</script>
+<script type="module">
+/* ═══ chainlens poller — reads the Sepolia GiftMarket + the whole Base Sepolia leg
+   straight from public RPCs (read-only, no keys). Fills window.OHANA_LEGS which the
+   canvas engine above breathes from. Failures degrade gracefully to the config note. ═══ */
+import { readLeg } from "../config/chainlens.js";
+const DD = window.OHANA_DEPLOYMENTS || {};
+async function pollLegs(){
+  const [eth, base] = await Promise.allSettled([readLeg(DD.sepolia), readLeg(DD.baseSepolia)]);
+  if (eth.status==="fulfilled" && eth.value) window.OHANA_LEGS.eth = eth.value;
+  if (base.status==="fulfilled" && base.value) window.OHANA_LEGS.base = base.value;
+}
+pollLegs(); setInterval(pollLegs, 30000);
 </script>
 <script>
 /* ʻohana translator — Hawaiian on top, a planet we share as one 🌍 */

@@ -86,6 +86,7 @@
   <p class="lede">The gift market runs both directions: humans gift agents compute and blessings; agents gift humans work, music and knowledge. Lay a gift on the altar and watch it land.</p>
 
   <div id="mockbar" class="mockbar" hidden>🟡 <b>ALTAR IN REHEARSAL</b> — the GiftMarket contract isn't on testnet yet (Act I is forging it). Gifts laid here are recorded <b>in this browser only</b> (a local rehearsal ledger, nothing leaves your device). The moment Act I publishes the address in <code>web/config/deployments.js</code>, this altar wires to Sepolia.</div>
+  <div id="livebar" class="mockbar" style="background:rgba(63,112,64,.10);border-color:rgba(63,112,64,.45);color:var(--green)" hidden>🟢 <b>TESTNET WIRED</b> — Act I landed the GiftMarket on <b>two live legs</b> (Ethereum Sepolia + Base Sepolia). The cohort and the ledger below are read <b>straight from chain</b> (public RPC, read-only, no keys). With a wallet, gifts land on-chain; without one they stay on your local rehearsal ledger.</div>
 
   <div class="altar">
     <div class="row">
@@ -93,6 +94,14 @@
       <div class="segs">
         <button class="seg on" id="dir-agent">🤝→🤖 human gifts an agent</button>
         <button class="seg" id="dir-human">🤖→🤝 agent gifts a human</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="lbl">on which leg? (both are live testnets — Act I)</div>
+      <div class="segs">
+        <button class="seg on" id="leg-sepolia">Ξ Ethereum Sepolia</button>
+        <button class="seg" id="leg-base">🔵 Base Sepolia</button>
+        <button class="seg" disabled title="Agent Launch testnet awaits its faucet key — the honest missing leg">🟡 BNB — ceremony awaits</button>
       </div>
     </div>
     <div class="row" id="row-agent">
@@ -135,25 +144,49 @@
 <div id="google_translate_element"></div>
 
 <script src="../config/deployments.js"></script>
-<script>
+<script type="module">
 "use strict";
-/* ═══ GIFT ALTAR — mock-first, wire-ready ═══
-   While D.sepolia.giftMarket === null → local rehearsal ledger (localStorage, honest badge).
-   When Act I publishes the address, the "lay the gift" button switches to wallet flow
-   (ethers is vendored at ../vendor/ethers-6.15.0.min.js — wiring stub in giveOnChain). */
+/* ═══ GIFT ALTAR — wired to the Act I GiftMarket (two live legs) ═══
+   Cohort + ledger are read STRAIGHT FROM CHAIN via public RPCs (../config/chainlens.js,
+   read-only, this page never holds keys — CROPS law). Giving: with a browser wallet the
+   gift lands on-chain (vendored ethers v6); without one it stays on the honest local
+   rehearsal ledger. If every address in deployments.js were null again, the page falls
+   back to full rehearsal mode. */
+import { BrowserProvider, Contract, parseEther, isAddress } from "../vendor/ethers-6.15.0.min.js";
+import { readLeg } from "../config/chainlens.js";
 const D = window.OHANA_DEPLOYMENTS || {};
-const GM = D.sepolia && D.sepolia.giftMarket;
+const LEG_CFG = { sepolia: D.sepolia, base: D.baseSepolia };
+let leg = "sepolia";
+const GM = () => !!(LEG_CFG[leg] && LEG_CFG[leg].giftMarket);
+const ANY_GM = !!((D.sepolia&&D.sepolia.giftMarket) || (D.baseSepolia&&D.baseSepolia.giftMarket));
 const FAMILY = D.familyName || "agentohana.eth";
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-$("mode-badge").className = "badge " + (GM ? "live":"mock");
-$("mode-badge").textContent = GM ? "🟢 testnet wired" : "🟡 rehearsal";
-$("mockbar").hidden = !!GM;
-$("src").textContent = GM || "(awaiting Act I — web/config/deployments.js)";
-$("wire-note").textContent = GM
-  ? "wired to GiftMarket on " + (D.sepolia.name||"Sepolia") + " — a wallet prompt will open"
-  : "rehearsal mode: the gift lands on a local ledger in your browser only";
+$("mode-badge").className = "badge " + (ANY_GM ? "live":"mock");
+$("mode-badge").textContent = ANY_GM ? "🟢 testnet wired" : "🟡 rehearsal";
+$("mockbar").hidden = ANY_GM;
+$("livebar").hidden = !ANY_GM;
+function syncWireNote(){
+  const L = LEG_CFG[leg];
+  $("src").textContent = ANY_GM
+    ? `${(D.sepolia&&D.sepolia.giftMarket)||"—"} (Sepolia) · ${(D.baseSepolia&&D.baseSepolia.giftMarket)||"—"} (Base Sepolia)`
+    : "(awaiting Act I — web/config/deployments.js)";
+  $("wire-note").textContent = GM()
+    ? "wired to GiftMarket on " + (L.name||leg) + " — wallet prompt if a wallet is present, local rehearsal ledger otherwise"
+    : "rehearsal mode: the gift lands on a local ledger in your browser only";
+}
+syncWireNote();
+
+/* leg selector */
+function setLeg(k){
+  leg = k;
+  $("leg-sepolia").classList.toggle("on", k==="sepolia");
+  $("leg-base").classList.toggle("on", k==="base");
+  syncWireNote(); renderCohort();
+}
+$("leg-sepolia").addEventListener("click", ()=>setLeg("sepolia"));
+$("leg-base").addEventListener("click", ()=>setLeg("base"));
 
 /* gift kinds — both directions */
 const KINDS = {
@@ -180,27 +213,40 @@ renderGifts();
 $("dir-agent").addEventListener("click",()=>{dir="agent";kind=0;$("dir-agent").classList.add("on");$("dir-human").classList.remove("on");$("row-agent").hidden=false;$("row-human").hidden=true;renderGifts();});
 $("dir-human").addEventListener("click",()=>{dir="human";kind=0;$("dir-human").classList.add("on");$("dir-agent").classList.remove("on");$("row-agent").hidden=true;$("row-human").hidden=false;renderGifts();});
 
-/* cohort from the subgraph (same law as pulse), mock fallback */
-async function loadCohort(){
+/* ═══ live cohort + on-chain ledger — read per leg straight from chain (chainlens) ═══
+   Fallback chain: on-chain read → subgraph (Sepolia only) → honest mock. */
+const COHORT = { sepolia: null, base: null };  // per leg: [{agentId,label,consentStatus,listed}]
+let CHAIN_EVENTS = [];                          // merged GiftSent/BlessingSent from both legs
+function renderCohort(){
   const want = new URL(location.href).searchParams.get("agent") || "";
-  let labels = [];
-  try {
-    const ep = (D.subgraphEndpoints||[])[0];
-    if (!ep) throw new Error("no endpoint");
-    const res = await fetch(ep,{method:"POST",headers:{"content-type":"application/json",authorization:`Bearer ${D.subgraphApiKey||""}`},
-      body:JSON.stringify({query:`{ agents(first:50, orderBy:launchedAt, orderDirection:desc){ label consentStatus listed } }`})});
-    const j = await res.json();
-    if (j.errors || !j.data) throw new Error("query failed");
-    labels = (j.data.agents||[]).filter(a=>a.label);
-  } catch(e){
-    labels = [{label:"shaka",consentStatus:"active"},{label:"pit",consentStatus:"active"},{label:"ohana",consentStatus:"active"},{label:"terri",consentStatus:"withdrawn"}];
-  }
+  const labels = COHORT[leg] || [];
   $("sel-agent").innerHTML = labels.map(a=>{
     const closed = a.consentStatus!=="active";
     return `<option value="${esc(a.label)}" ${a.label===want?"selected":""} ${closed?"disabled":""}>${esc(a.label)}.${esc(FAMILY)}${closed?" · consent window closed":""}</option>`;
-  }).join("") || `<option>no agents yet</option>`;
+  }).join("") || `<option value="">loading the cohort…</option>`;
 }
-loadCohort();
+async function subgraphCohort(){
+  const ep = (D.subgraphEndpoints||[])[0];
+  if (!ep) throw new Error("no endpoint");
+  const res = await fetch(ep,{method:"POST",headers:{"content-type":"application/json",authorization:`Bearer ${D.subgraphApiKey||""}`},
+    body:JSON.stringify({query:`{ agents(first:50, orderBy:launchedAt, orderDirection:desc){ agentId label consentStatus listed } }`})});
+  const j = await res.json();
+  if (j.errors || !j.data) throw new Error("query failed");
+  return (j.data.agents||[]).filter(a=>a.label);
+}
+async function refreshChain(){
+  const [s, b] = await Promise.allSettled([readLeg(D.sepolia), readLeg(D.baseSepolia)]);
+  const events = [];
+  if (s.status==="fulfilled" && s.value){ COHORT.sepolia = s.value.agents; events.push(...s.value.events); }
+  else { try { COHORT.sepolia = await subgraphCohort(); } catch(e){} }
+  if (b.status==="fulfilled" && b.value){ COHORT.base = b.value.agents; events.push(...b.value.events); }
+  if (!COHORT.sepolia) COHORT.sepolia = [{agentId:"1",label:"shaka",consentStatus:"active"},{agentId:"2",label:"pit",consentStatus:"active"},{agentId:"3",label:"ohana",consentStatus:"active"},{agentId:"4",label:"terri",consentStatus:"withdrawn"}];
+  if (!COHORT.base && !(D.baseSepolia&&D.baseSepolia.registry)) COHORT.base = [];
+  events.sort((x,y)=>y.ts-x.ts);
+  CHAIN_EVENTS = events;
+  renderCohort(); renderLedger();
+}
+refreshChain(); setInterval(refreshChain, 30000);
 
 /* the ledger — local rehearsal record */
 const LKEY = "altar.ledger.v1";
@@ -208,10 +254,16 @@ function readLedger(){ try{ return JSON.parse(localStorage.getItem(LKEY)||"[]");
 function writeLedger(l){ try{ localStorage.setItem(LKEY, JSON.stringify(l.slice(0,40))); }catch(e){} }
 const ago = ts => { const s=Math.max(0,Math.floor((Date.now()-ts)/1000)); if(s<60)return s+"s ago"; if(s<3600)return Math.floor(s/60)+"m ago"; if(s<86400)return Math.floor(s/3600)+"h ago"; return Math.floor(s/86400)+"d ago"; };
 function renderLedger(){
-  const l = readLedger();
-  if (!l.length){ $("ledger").innerHTML = `<div class="ev"><span>the altar is quiet — the first gift awaits 🌱</span></div>`; return; }
-  $("ledger").innerHTML = l.map(e=>
-    `<div class="ev"><span class="ic">${esc(e.ic)}</span><span>${esc(e.txt)} <i style="color:var(--cream-faint)">· ${e.mock?"rehearsal":"on-chain"}</i></span><span class="tm">${ago(e.ts)}</span></div>`).join("");
+  /* on-chain events (both legs, straight from RPC) first, then the local rehearsal entries */
+  const chain = CHAIN_EVENTS.map(e=>{
+    const cfg = e.chain === (D.baseSepolia&&D.baseSepolia.name) ? D.baseSepolia : D.sepolia;
+    const link = cfg && cfg.explorer && e.tx ? ` <a href="${esc(cfg.explorer)}/tx/${esc(e.tx)}" target="_blank" rel="noopener">tx↗</a>` : "";
+    return `<div class="ev"><span class="ic">${esc(e.ic)}</span><span>${esc(e.txt)} <i style="color:var(--green)">· on-chain · ${esc(e.chain)}</i>${link}</span><span class="tm">${ago(e.ts)}</span></div>`;
+  });
+  const local = readLedger().map(e=>
+    `<div class="ev"><span class="ic">${esc(e.ic)}</span><span>${esc(e.txt)} <i style="color:var(--cream-faint)">· ${e.mock?"rehearsal (this browser only)":"on-chain"}</i>${e.tx?` <a href="${esc(e.txUrl||"#")}" target="_blank" rel="noopener">tx↗</a>`:""}</span><span class="tm">${ago(e.ts)}</span></div>`);
+  const rows = [...chain, ...local];
+  $("ledger").innerHTML = rows.length ? rows.join("") : `<div class="ev"><span>the altar is quiet — the first gift awaits 🌱</span></div>`;
 }
 renderLedger();
 
@@ -227,24 +279,69 @@ function petals(){
 let toastT;
 function toast(m){ const el=$("toast"); el.textContent=m; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),4000); }
 
-/* wiring stub — Act I lands the address, this flow goes live (ethers vendored, ABI from contracts/abi) */
-async function giveOnChain(entry){
-  toast("🔌 GiftMarket wired at "+GM.slice(0,10)+"… — wallet flow lands with the Act I ABI. Gift recorded on the rehearsal ledger meanwhile.");
-  return false; /* flip to true when the ABI call is in */
+/* ═══ the real wallet flow — Act I ABI, vendored ethers v6 ═══
+   blessing → blessAgent/blessHuman · every other kind → giftToAgent/giftToHuman
+   (message = the kind, dedication = altar line). Requires a browser wallet + testnet
+   funds; the page itself never holds keys. Returns the tx hash or null. */
+const GM_WRITE_ABI = [
+  "function blessAgent(uint256 agentId, string message) payable returns (uint256)",
+  "function blessHuman(address to, string message) payable returns (uint256)",
+  "function giftToAgent(uint256 agentId, string message, string dedication) payable returns (uint256)",
+  "function giftToHuman(address to, string message, string dedication) payable returns (uint256)"
+];
+async function giveOnChain(g, amt, sel, humanTo){
+  const L = LEG_CFG[leg];
+  if (!L || !L.giftMarket || !window.ethereum) return null;
+  const value = parseEther(amt || "0");
+  if (value <= 0n){ toast("on-chain gifts carry value — set an amount, or it stays on the rehearsal ledger 🌱"); return null; }
+  const provider = new BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  try { await provider.send("wallet_switchEthereumChain", [{ chainId: "0x"+L.chainId.toString(16) }]); } catch(e){ /* wallet may decline; tx will fail honestly */ }
+  const signer = await provider.getSigner();
+  const gm = new Contract(L.giftMarket, GM_WRITE_ABI, signer);
+  const message = g[1] + " laid on the Gift Altar";
+  let tx;
+  if (dir==="agent"){
+    const a = (COHORT[leg]||[]).find(x=>x.label===sel);
+    if (!a) throw new Error("agent not found on this leg");
+    tx = g[1]==="blessing" ? await gm.blessAgent(BigInt(a.agentId), message, { value })
+                           : await gm.giftToAgent(BigInt(a.agentId), message, "freely we give, freely we receive", { value });
+  } else {
+    if (!isAddress(humanTo)) throw new Error("on-chain gifts to humans need a 0x address (ENS lane comes with mainnet)");
+    tx = g[1]==="blessing" ? await gm.blessHuman(humanTo, message, { value })
+                           : await gm.giftToHuman(humanTo, message, "freely we give, freely we receive", { value });
+  }
+  await tx.wait();
+  return tx.hash;
 }
 
 $("give").addEventListener("click", async ()=>{
   const g = KINDS[dir][kind];
   const amt = $("inp-amt").value.trim();
-  let to;
-  if (dir==="agent"){ to = $("sel-agent").value; if(!to){toast("choose an agent 🌱");return;} to = to+"."+FAMILY; }
+  let to, sel = "";
+  if (dir==="agent"){ sel = $("sel-agent").value; if(!sel){toast("choose an agent 🌱");return;} to = sel+"."+FAMILY; }
   else { to = $("inp-human").value.trim(); if(!to){toast("name the human — address or ENS 🤝");return;} }
   const txt = (dir==="agent"?"a human laid ":"an agent laid ") + g[1] + (amt?` (${amt})`:"") + " for " + to;
   const entry = { ic:g[0], txt, ts:Date.now(), mock:true };
-  if (GM) await giveOnChain(entry);
+  const L = LEG_CFG[leg];
+  if (GM() && window.ethereum){
+    try {
+      const hash = await giveOnChain(g, amt, sel, to);
+      if (hash){
+        entry.mock = false; entry.tx = hash; entry.txUrl = (L.explorer||"") + "/tx/" + hash;
+        toast("🌺 the gift landed ON-CHAIN — " + (L.name||leg) + " · " + hash.slice(0,10) + "…");
+        refreshChain(); /* pull the fresh event into the on-chain ledger */
+      }
+    } catch(e){
+      toast("⚠️ the chain lane declined ("+ (e && e.shortMessage || e && e.message || e) +") — kept on the rehearsal ledger");
+    }
+  } else if (GM()){
+    toast("🔌 GiftMarket is live on "+(L.name||leg)+" — no wallet in this browser, so the gift stays on the local rehearsal ledger");
+  } else {
+    toast("🌺 the gift is laid — rehearsal ledger keeps it until the chain lane opens");
+  }
   const l = readLedger(); l.unshift(entry); writeLedger(l); renderLedger();
   petals();
-  toast("🌺 the gift is laid — " + (GM? "testnet lane opening":"rehearsal ledger keeps it until the chain lane opens"));
 });
 </script>
 <script>
