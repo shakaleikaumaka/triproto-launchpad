@@ -27,6 +27,7 @@ window.OSO_PAD_CONFIG = {
       rpc: 'https://sepolia.gateway.tenderly.co', // publicnode prunes logs to ~10k blocks — tenderly keeps full history
       explorer: 'https://sepolia.etherscan.io',
       address: '0x62412fcA6437b914EDD87b85455682Ec73968347', // AgentLaunchRegistry (Sepolia, deployed 2026-09-13)
+      giftMarket: '0x4Cbc337c8F63FFc0e8e96D5F5ea89A75eD31E575', // GiftMarket (Act I) — hire lives HERE, echoed to the registry
       deployBlock: 11692692,                // read events from birth (public RPCs cap getLogs ranges)
     },
     84532: {
@@ -34,6 +35,7 @@ window.OSO_PAD_CONFIG = {
       rpc: 'https://sepolia.base.org',
       explorer: 'https://sepolia.basescan.org',
       address: '0xAfd78515B0Ef275595547d9Cc0207aE326bd8a34', // AgentLaunchRegistry (Base Sepolia — Act I)
+      giftMarket: '0x24B55471bB1d5Ab29D1D24f102dce6a6a5851937', // GiftMarket (Act I)
       deployBlock: 46823445,
     },
     97: {
@@ -44,19 +46,30 @@ window.OSO_PAD_CONFIG = {
     },
   },
   defaultChain: 11155111,
-  // Expected registry surface (human-readable ABI, ethers v6).
-  // MIRROR of contracts/AgentLaunchRegistry.sol (Lane A) — refresh on deploy.
+  // Registry surface (human-readable ABI, ethers v6) — MIRROR of the DEPLOYED
+  // contracts/abi/AgentLaunchRegistry.json (integration fix #1 fixed the read events;
+  // fix #2 fixed the writes: launch()/setConsentWindow()/hire() never existed on the real
+  // contract — the deployed verbs are launchAgent/setConsent, and hire lives in the GiftMarket).
   registryAbi: [
-    // real deployed AgentLaunchRegistry signatures (integration fix: the old imagined
-    // signatures had different topic0 hashes, so live reads always decoded 0 events)
     'event AgentLaunched(uint256 indexed agentId, address indexed operator, bytes32 indexed manifestHash, string manifestURI, string serviceEndpoint, string label, uint64 expiry)',
     'event ConsentChanged(uint256 indexed agentId, uint8 indexed status, address indexed changedBy, string consentContact, string pitPointer)',
-    'event Hired(uint256 indexed agentId, address indexed client, uint256 amount, string jobURI)',
-    'event Blessed(uint256 indexed agentId, address indexed by)',
-    'function launch(address operator, string name, string symbol, string manifestURI, string endpoint) returns (uint256 agentId)',
-    'function setConsentWindow(uint256 agentId, uint8 window)',
-    'function hire(uint256 agentId, string jobURI) payable',
+    'event Hired(uint256 indexed agentId, address indexed client, uint256 amount, string rail, string receiptRef)',
+    'event Blessed(uint256 indexed agentId, address indexed operator, string verifier, string proofRef)',
+    'function launchAgent(address operator, string manifestURI, bytes32 manifestHash, string serviceEndpoint, string label, string consentContact, string pitPointer, uint64 duration) returns (uint256 agentId)',
+    'function setConsent(uint256 agentId, uint8 status, string consentContact, string pitPointer)',
+    'function ownerOf(uint256 tokenId) view returns (address)',
+    'function pad() view returns (address)',
+    'function getMetadata(uint256 agentId, string metadataKey) view returns (bytes)',
   ],
+  // GiftMarket surface — MIRROR of contracts/abi/GiftMarket.json (Act I).
+  // hire(listingId) pays the agent's CURRENT operator and is echoed as a registry Hired event.
+  giftMarketAbi: [
+    'function totalListings() view returns (uint256)',
+    'function getListing(uint256 listingId) view returns (address lister, address payee, uint256 agentId, uint256 price, uint8 kind, bool active)',
+    'function hire(uint256 listingId, string jobRef) payable',
+  ],
+  // Cohort canon for launch-form defaults (read back from the live Sepolia cohort):
+  consentDefaults: { contact: 'aloha@myagentohana.com', pitPrefix: 'pit://publicinform/' },
   // Lane B hook — World Selfie Check. integrations/world registers
   // window.OHANA_WORLD = { verify: async (operatorAddress) => bool }
   world: {
@@ -362,7 +375,7 @@ window.OSO_PAD_CONFIG = {
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { BrowserProvider, JsonRpcProvider, Contract, isAddress } from './vendor/ethers-6.15.0.min.js';
+import { BrowserProvider, JsonRpcProvider, Contract, isAddress, keccak256, toUtf8Bytes, toUtf8String, formatEther } from './vendor/ethers-6.15.0.min.js';
 
 const CFG = window.OSO_PAD_CONFIG;
 const WINDOWS = ['active', 'paused', 'withdrawn'];
@@ -479,7 +492,7 @@ function renderAgents() {
       </div>
       <div class="actions">
         ${l.consent !== 'withdrawn'
-          ? `<button class="btn small" data-act="hire" data-id="${esc(l.id)}">⚡ Hire · $0.0042</button>
+          ? `<button class="btn small" data-act="hire" data-id="${esc(l.id)}">${l.source === 'live' ? '⚡ Hire · gift market' : '⚡ Hire · $0.0042'}</button>
              <button class="btn small ghost" data-act="pause" data-id="${esc(l.id)}">${l.consent === 'paused' ? 'Resume' : 'Pause'}</button>
              <button class="btn small danger" data-act="withdraw" data-id="${esc(l.id)}">One-word revoke</button>`
           : `<span class="tag rose">delisted — consent withdrawn</span>`}
@@ -523,7 +536,20 @@ async function loadLiveEvents() {
   }
 }
 
-/* ─────────────── launch ─────────────── */
+/* ─────────────── launch (real verb: launchAgent) ─────────────── */
+/* The registry stores keccak256 of the manifest BYTES (verifyManifest checks exactly that).
+   Best effort from a browser: fetch the manifest and hash its bytes; when the URI can't be
+   fetched here (ipfs:// gateway down, CORS), fall back to hashing the URI string — an honest
+   placeholder the operator corrects later with updateManifestHash(). */
+async function manifestHashOf(manifestURI) {
+  try {
+    const url = manifestURI.startsWith('ipfs://') ? 'https://ipfs.io/ipfs/' + manifestURI.slice(7) : manifestURI;
+    const r = await fetch(url);
+    if (r.ok) return { hash: keccak256(new Uint8Array(await r.arrayBuffer())), of: 'manifest bytes' };
+  } catch (_) { /* fall through to the honest placeholder */ }
+  return { hash: keccak256(toUtf8Bytes(manifestURI)), of: 'URI string — manifest unfetchable from the browser; correct later via updateManifestHash()' };
+}
+
 async function onLaunch(ev) {
   ev.preventDefault();
   const operator = $('f-operator').value.trim();
@@ -536,8 +562,13 @@ async function onLaunch(ev) {
   if (previewMode()) { toast('Preview mode — contract addresses TBD. Fill window.OSO_PAD_CONFIG after Lane A deploys and this same button goes live.', true); return; }
   if (!wallet.address) { await connectWallet(); if (!wallet.address) return; }
 
+  /* ENS-style label from the symbol (the cohort canon: shaka · pit · ohana · terri) */
+  const label = (symbol || name).toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (!label) { toast('Symbol must contain at least one a-z / 0-9 character (it becomes the ENS label)', true); return; }
+
   const box = $('launch-receipts');
   box.innerHTML = '';
+  const mh = await manifestHashOf(manifest);
   for (const [chainIdStr, c] of Object.entries(CFG.chains)) {
     if (!c.address) continue;
     const chainId = Number(chainIdStr);
@@ -548,10 +579,27 @@ async function onLaunch(ev) {
     try {
       if (!(await ensureChain(chainId))) { line.textContent = `${c.name}: skipped (wrong chain)`; continue; }
       const reg = new Contract(c.address, CFG.registryAbi, wallet.signer);
-      const tx = await reg.launch(operator, name, symbol, manifest, endpoint);
+      /* registry law: only the pad wallet or the operator themself may launch */
+      try {
+        const pad = (await reg.pad()).toLowerCase();
+        const me = wallet.address.toLowerCase();
+        if (me !== pad && me !== operator.toLowerCase()) {
+          line.textContent = `${c.name}: skipped — registry law: only the pad wallet or the operator themself may launch (connect ${short(operator)} or the pad)`;
+          continue;
+        }
+      } catch (_) { /* pre-check unavailable — the contract will still enforce it */ }
+      /* duration 0 = permanent subname (type(uint64).max expiry) */
+      const tx = await reg.launchAgent(
+        operator, manifest, mh.hash, endpoint, label,
+        CFG.consentDefaults.contact, CFG.consentDefaults.pitPrefix + label, 0n
+      );
       line.textContent = `${c.name}: tx sent ${short(tx.hash)} — waiting…`;
       const rc = await tx.wait();
-      line.innerHTML = `${c.name}: <b>launched ✓</b> · block ${rc.blockNumber} · <a href="${c.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${short(tx.hash)}</a>`;
+      let agentId = null;
+      for (const log of rc.logs) {
+        try { const p = reg.interface.parseLog(log); if (p?.name === 'AgentLaunched') { agentId = p.args.agentId.toString(); break; } } catch (_) { /* other contract's log */ }
+      }
+      line.innerHTML = `${c.name}: <b>launched ✓</b>${agentId ? ` · agent #${esc(agentId)} · ${esc(label)}.${esc(CFG.ensParent)}` : ''} · block ${rc.blockNumber} · <a href="${c.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${short(tx.hash)}</a> · manifestHash of ${esc(mh.of)}`;
     } catch (e) {
       line.textContent = `${c.name}: ${e?.shortMessage || e?.message || 'launch failed'}`;
     }
@@ -578,11 +626,11 @@ function openConsentModal(listingId) {
 async function writeConsent(listingId, windowNum) {
   const l = listings.get(listingId);
   if (!l) return;
-  if (previewMode()) {
-    // preview: flip locally so the choreography is rehearsable before deploy
+  if (previewMode() || l.source !== 'live') {
+    // preview/seed cards: flip locally so the choreography is rehearsable — no tx exists for these
     l.consent = WINDOWS[windowNum];
     renderAgents();
-    toast(`${l.name}: consent → ${WINDOWS[windowNum]} (preview — no tx yet)`);
+    toast(`${l.name}: consent → ${WINDOWS[windowNum]} (rehearsal card — no tx; the live cohort cards write on-chain)`);
     return;
   }
   if (!wallet.address) { await connectWallet(); if (!wallet.address) return; }
@@ -593,8 +641,22 @@ async function writeConsent(listingId, windowNum) {
   if (!(await ensureChain(chainId))) return;
   try {
     const reg = new Contract(c.address, CFG.registryAbi, wallet.signer);
-    const tx = await reg.setConsentWindow(agentIdNum, windowNum);
-    toast(`ConsentChanged sent — ${short(tx.hash)}`);
+    /* consent law: only the operator (identity-NFT holder or approved) flips the window */
+    try {
+      const owner = (await reg.ownerOf(agentIdNum)).toLowerCase();
+      if (owner !== wallet.address.toLowerCase()) {
+        toast(`Consent law: only ${l.name}'s operator ${short(owner)} can flip the window — the connected wallet holds no keys here.`, true);
+        return;
+      }
+    } catch (_) { /* pre-check unavailable — the contract still enforces it */ }
+    /* real verb: setConsent(agentId, status, contact, pit) — pass the on-chain contact/pit through unchanged */
+    let contact = CFG.consentDefaults.contact, pit = CFG.consentDefaults.pitPrefix + (l.name || '').toLowerCase();
+    try {
+      contact = toUtf8String(await reg.getMetadata(agentIdNum, 'consent.contact')) || contact;
+      pit = toUtf8String(await reg.getMetadata(agentIdNum, 'pit')) || pit;
+    } catch (_) { /* keep the canon defaults */ }
+    const tx = await reg.setConsent(agentIdNum, windowNum, contact, pit);
+    toast(`ConsentChanged sent — ${short(tx.hash)}${windowNum === 2 ? ' · withdrawn is a one-way door: the registry delists in the same tx' : ''}`);
     await tx.wait();
     await loadLiveEvents();
     renderAgents();
@@ -602,12 +664,52 @@ async function writeConsent(listingId, windowNum) {
   } catch (e) { toast(e?.shortMessage || e?.message || 'consent write failed', true); }
 }
 
-/* ─────────────── hire (x402 machine pennies) ─────────────── */
-function onHire(listingId) {
+/* ─────────────── hire — the real verb lives in the GiftMarket ───────────────
+   GiftMarket.hire(listingId, jobRef) pays the agent's CURRENT operator (no custody, no fees),
+   demands listed + active consent per-tx, and — because the pad allowlisted the market as a
+   hireRecorder — is echoed as a registry Hired event the subgraph already indexes. */
+async function findAgentListing(chainId, agentId) {
+  const c = CFG.chains[chainId];
+  if (!c?.giftMarket) return null;
+  const market = new Contract(c.giftMarket, CFG.giftMarketAbi, new JsonRpcProvider(c.rpc));
+  const total = Number(await market.totalListings());
+  for (let lid = total; lid >= 1; lid--) { // newest first
+    const L = await market.getListing(lid);
+    if (Number(L.kind) === 1 /* Kind.Agent */ && L.active && L.agentId.toString() === String(agentId)) {
+      return { listingId: lid, price: L.price };
+    }
+  }
+  return null;
+}
+
+async function onHire(listingId) {
   const l = listings.get(listingId);
   if (!l) return;
   if (l.consent === 'withdrawn') { toast('This agent has withdrawn consent — delisted. The right to leave is part of launch.', true); return; }
-  toast(`x402 rail: a client hits ${l.name}'s endpoint, gets a 402, pays $0.0042, receives the work — receipt lands in the Pulse within the minute. (Endpoint wiring: Lane A/C post-deploy.)`);
+  if (previewMode() || l.source !== 'live') {
+    toast(`x402 rail rehearsal: a client hits ${l.name}'s endpoint, gets a 402, pays $0.0042, receives the work. (This is a seed card — the live cohort cards hire through the on-chain GiftMarket.)`);
+    return;
+  }
+  const [chainIdStr, agentIdNum] = String(listingId).split(':');
+  const chainId = Number(chainIdStr);
+  const c = CFG.chains[chainId];
+  try {
+    toast(`Looking up ${l.name}'s open listing on the ${c.name} GiftMarket…`);
+    const open = await findAgentListing(chainId, agentIdNum);
+    if (!open) {
+      toast(`${l.name} has no open GiftMarket listing on ${c.name} yet — its operator opens one with listForAgent(). The x402 endpoint rail is the other hire door.`, true);
+      return;
+    }
+    if (!wallet.address) { await connectWallet(); if (!wallet.address) return; }
+    if (!(await ensureChain(chainId))) return;
+    /* exact price, or pay-what-you-wish (price=0) → the canonical $0.0042 machine pennies */
+    const value = open.price > 0n ? open.price : BigInt(CFG.hirePriceWei);
+    const market = new Contract(c.giftMarket, CFG.giftMarketAbi, wallet.signer);
+    const tx = await market.hire(open.listingId, `pad://landing/hire/${(l.name || '').toLowerCase()}`, { value });
+    toast(`Hire sent — listing #${open.listingId} · ${formatEther(value)} ETH → ${l.name}'s operator · ${short(tx.hash)}`);
+    const rc = await tx.wait();
+    toast(`Hired ✓ block ${rc.blockNumber} — the registry Hired echo lands on the Pulse. ${c.explorer}/tx/${tx.hash}`);
+  } catch (e) { toast(e?.shortMessage || e?.message || 'hire failed', true); }
 }
 
 /* ─────────────── wire up ─────────────── */
@@ -642,7 +744,7 @@ $('agents').addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-act]');
   if (!btn) return;
   const { act, id } = btn.dataset;
-  if (act === 'hire') onHire(id);
+  if (act === 'hire') await onHire(id);
   if (act === 'withdraw') openConsentModal(id);
   if (act === 'pause') {
     const l = listings.get(id);
